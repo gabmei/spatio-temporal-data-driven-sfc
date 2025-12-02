@@ -3,6 +3,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <filesystem>
 #include <utility>
 #include <iostream>
 
@@ -66,7 +67,8 @@ namespace opencv_util {
    * @brief Draws the path of pixels followed by the Space-Filling Curve
    *
    * The image is resized by 'expand_size'. A line is then drawn between
-   * consecutive pixels centers. After that, shrink the image back to it's original size
+   * consecutive pixels centers. If the image given is grayscale, converts to
+   * RGB.
    *
    * @param original_img The image to draw on.
    * @param ord A vector of (row, col) pairs defining the path in the image.
@@ -86,6 +88,11 @@ namespace opencv_util {
     }
     cv::Mat img = original_img.clone();
 
+    // if there is only one channel convert to grayscale
+    if(img.channels() == 1) {
+      cv::cvtColor(img, img, cv::COLOR_GRAY2BGR);
+    }
+
     cv::Size original_size(img.cols, img.rows);
     cv::Size new_size(img.cols * expand_size, img.rows * expand_size);
     cv::resize(img, img, new_size);
@@ -102,6 +109,27 @@ namespace opencv_util {
     }
     // cv::resize(img, img, original_size);
     return img;
+  }
+
+  void process_image(cv::Mat& output_img, const cv::Mat& input_img, const std::vector<std::pair<int, int>>& ord, int col_index, int pixel_width) {
+    for(int i = 0, len = (int)ord.size(); i < len; ++i) {
+      auto [r, c] = ord[i];
+      cv::Scalar pixel_color;
+      
+      if(input_img.channels() == 1) {
+        uchar gray_value = input_img.at<uchar>(r, c);
+        
+        pixel_color = cv::Scalar(gray_value);
+      } else {
+        cv::Vec3b bgr_color = input_img.at<cv::Vec3b>(r, c);
+
+        pixel_color = cv::Scalar(bgr_color[0], bgr_color[1], bgr_color[2]);
+      }
+
+      cv::Point p1(col_index * pixel_width, i);
+      cv::Point p2((col_index + 1) * pixel_width - 1, i);
+      cv::rectangle(output_img, p1, p2, pixel_color);
+    }
   }
 
   template<typename T>
