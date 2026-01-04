@@ -1,4 +1,4 @@
 .vscode
-*.out
-output*
-bin/
+.venv
+build/
+data_driven_module*/

@@ -25,7 +25,7 @@ public:
    * @param id_b The [x, y] coordinates of the unvisited node.
    * @return The calculated cost or distance.
    */
-  virtual distance_type get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) = 0;
+  virtual distance_type get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) const = 0;
 protected:
   std::vector<std::vector<std::vector<grid_type>>> grid;
 };

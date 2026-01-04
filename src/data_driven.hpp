@@ -37,39 +37,39 @@ public:
    * @param id_b The [x, y] coordinates of the unvisited node.
    * @return The calculated cost or distance.
    */
-  distance_type get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) override;
+  distance_type get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) const override;
 private:
   distance_type ALPHA;
   int BLOCK;
   std::pair<distance_type, distance_type> BLOCK_CENTER;
-  distance_type adj_edge_cost(std::pair<int, int> id_a, std::pair<int, int> id_b);
-  distance_type pixel_edge_cost(std::pair<int, int> a, std::pair<int, int> b);
-  distance_type block_edge_cost(std::pair<int, int> id_b);
+  distance_type adj_edge_cost(std::pair<int, int> id_a, std::pair<int, int> id_b) const;
+  distance_type pixel_edge_cost(std::pair<int, int> a, std::pair<int, int> b) const;
+  distance_type block_edge_cost(std::pair<int, int> id_b) const;
 };
 
 
 template<typename distance_type, typename grid_type>
-distance_type DataDrivenDistance<distance_type, grid_type>::block_edge_cost(std::pair<int, int> id_b) {
+distance_type DataDrivenDistance<distance_type, grid_type>::block_edge_cost(std::pair<int, int> id_b) const {
   id_b.first %= BLOCK;
   id_b.second %= BLOCK;
-  auto dx = (distance_type)id_b.first - BLOCK_CENTER.first, dy = (distance_type)id_b.second - BLOCK_CENTER.second;
+  auto dx = static_cast<distance_type>(id_b.first) - BLOCK_CENTER.first, dy = static_cast<distance_type>(id_b.second) - BLOCK_CENTER.second;
   return std::sqrt(dx * dx + dy * dy);
 }
 
 template<typename distance_type, typename grid_type>
-distance_type DataDrivenDistance<distance_type, grid_type>::pixel_edge_cost(std::pair<int, int> a, std::pair<int, int> b) {
+distance_type DataDrivenDistance<distance_type, grid_type>::pixel_edge_cost(std::pair<int, int> a, std::pair<int, int> b) const {
   distance_type pixel_cost = 0;
   auto& ra = this->grid[a.first][a.second];
   auto& rb = this->grid[b.first][b.second];
   
   for(size_t i = 0, len = ra.size(); i < len; ++i) {
-    pixel_cost += (distance_type)std::abs(ra[i] - rb[i]);
+    pixel_cost += std::abs(static_cast<distance_type>(ra[i]) - static_cast<distance_type>(rb[i]));
   }
   return pixel_cost;
 }
 
 template<typename distance_type, typename grid_type>
-distance_type DataDrivenDistance<distance_type, grid_type>::adj_edge_cost(std::pair<int, int> id_a, std::pair<int, int> id_b) {
+distance_type DataDrivenDistance<distance_type, grid_type>::adj_edge_cost(std::pair<int, int> id_a, std::pair<int, int> id_b) const {
   distance_type cost = 0;
   auto cycle_b = util::get_node_cycle(id_b);
   std::pair<int, int> dir_ab = {id_b.first - id_a.first, id_b.second - id_a.second};
@@ -91,7 +91,7 @@ distance_type DataDrivenDistance<distance_type, grid_type>::adj_edge_cost(std::p
 }
 
 template<typename distance_type, typename grid_type>
-distance_type DataDrivenDistance<distance_type, grid_type>::get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) {
+distance_type DataDrivenDistance<distance_type, grid_type>::get_distance(std::pair<int, int> id_a, std::pair<int, int> id_b) const {
   return (1 - ALPHA) * adj_edge_cost(id_a, id_b) + ALPHA * block_edge_cost(id_b);
 }
 

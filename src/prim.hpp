@@ -3,12 +3,13 @@
 
 #include <vector>
 #include <set>
-#include <queue>        // For std::priority_queue
-#include <tuple>        // For std::tuple
-#include <utility>      // For std::pair, std::make_pair
-#include <limits>       // For std::numeric_limits
-#include <functional>   // For std::greater
-#include <iostream>     // For std::cerr
+#include <queue>        // std::priority_queue
+#include <tuple>        // std::tuple
+#include <utility>      // std::pair, std::make_pair
+#include <limits>       // std::numeric_limits
+#include <functional>   // std::greater
+#include <format>       // std::format
+#include <stdexcept>    // std::runtime_error
 
 // Custom headers
 #include "dsu.hpp"
@@ -38,7 +39,6 @@ public:
     node_c { c / 2 },
     adj(r, std::vector<std::set<std::pair<int, int>>>(c))
   {
-    std::cerr << "Grid dimensions: " << r << ' ' << c << '\n';
     initial_adj(); // Build the initial graph
   }
 
@@ -50,7 +50,7 @@ public:
    * used to calculate costs between nodes.
    * @return A vector of pixel coordinates representing the space-filling curve.
    */
-  std::vector<std::pair<int, int>> run(Distance<distance_type, grid_type>& dist_calc);
+  std::vector<std::pair<int, int>> run(const Distance<distance_type, grid_type>& dist_calc);
 
 private:
   int r, c;           // Pixel grid dimensions
@@ -69,7 +69,7 @@ private:
 };
 
 template<typename distance_type, typename grid_type>
-std::vector<std::pair<int, int>> Prim<distance_type, grid_type>::run(Distance<distance_type, grid_type>& dist_calc) {
+std::vector<std::pair<int, int>> Prim<distance_type, grid_type>::run(const Distance<distance_type, grid_type>& dist_calc) {
   std::vector par(node_r, std::vector<std::pair<int, int>>(node_c, std::make_pair(-1, -1)));
   
   using iii = std::tuple<distance_type, int, int>;
@@ -123,8 +123,13 @@ std::vector<std::pair<int, int>> Prim<distance_type, grid_type>::run(Distance<di
       hi = std::max(hi, sz);
     }
   }
-  std::cerr << "min and max degree (it should be both two): ";
-  std::cerr << lo << ' ' << hi << '\n';
+  if (lo != 2 || hi != 2) {
+    throw std::runtime_error(std::format(
+      "Topology Error: Generated graph is not a valid cycle.\n"
+      "Expected degree 2. Found min_degree={}, max_degree={}.", 
+      lo, hi
+    ));
+  }
 
   DisjointSetUnion dsu(r * c);
   int ncomps = r * c;
@@ -141,8 +146,13 @@ std::vector<std::pair<int, int>> Prim<distance_type, grid_type>::run(Distance<di
     }
   }
 
-  std::cerr << "number of components (it should be one): " << ncomps << '\n';
-
+  if (ncomps != 1) {
+    throw std::runtime_error(std::format(
+      "Connectivity Error: Graph is disconnected.\n"
+      "Expected 1 component, found {}.", 
+      ncomps
+    ));
+  }
   std::vector<std::pair<int, int>> pixel_order;
   std::pair<int, int> cur = {0, 0};
   std::vector is_visited(r, std::vector<bool>(c, false));
@@ -157,7 +167,13 @@ std::vector<std::pair<int, int>> Prim<distance_type, grid_type>::run(Distance<di
     }
   } while(!is_visited[cur.first][cur.second]);
 
-  std::cerr << "SELECTED " << select_count * 4 << " PIXELS. PATH LENGTH: " << pixel_order.size() << '\n';
+  if (pixel_order.size() != (size_t)(r * c)) {
+    throw std::runtime_error(std::format(
+      "Path Integrity Error: Space-filling curve is incomplete.\n"
+      "Expected {} pixels, but traversed {}.", 
+      r * c, pixel_order.size()
+    ));
+  }
   return pixel_order;
 }
 
