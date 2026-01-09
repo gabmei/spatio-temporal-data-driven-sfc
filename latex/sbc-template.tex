@@ -6,12 +6,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazilian]{babel}
 \usepackage{csquotes}
-\usepackage[style=numeric, backend=biber]{biblatex}
 \usepackage{tikz}
 \usepackage{amsmath}
 
-\addbibresource{sbc-template.bib}
-\setlength{\bibitemsep}{6pt}
+%% \usepackage[style=numeric, backend=biber]{biblatex}
+%% \addbibresource{sbc-template.bib}
+%% \setlength{\bibitemsep}{6pt}
      
 \sloppy
 
@@ -149,7 +149,7 @@ $w(e) = \sum_{k \in \{R,G,B\}} |a_k - b_k|$.
 
 Dessa maneira, a abordagem \textit{context-based} gera linearizações que priorizam a coerência dos dados. 
 Contudo, este método não considera explicitamente a coerência espacial durante a construção da curva.
-A abordagem \textit{data-driven}, detalhada por Zhou et al. \cite{zhou:20}, soluciona essa limitação
+A abordagem \textit{data-driven}, detalhada por Zhou et al.~\cite{zhou:20}, soluciona essa limitação
 introduzindo uma nova função de custo composta, preservando, no entanto, a estrutura fundamental
 de mapeamento dual e MST proposta no artigo original \cite{dafner:00}.
 
@@ -477,8 +477,8 @@ O código-fonte desenvolvido encontra-se disponível publicamente no repositóri
 % before each reference. The first line of each reference should not be
 % indented, while the subsequent should be indented by 0.5 cm.
 
-\printbibliography
-% \bibliographystyle{sbc}
-% \bibliography{sbc-template}
+%\printbibliography
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
 
 \end{document}
