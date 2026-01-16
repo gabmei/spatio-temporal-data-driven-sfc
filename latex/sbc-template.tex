@@ -37,26 +37,139 @@ Universidade Federal de Pernambuco (UFPE) -- Recife, PE -- Brazil
 \maketitle
 
 \begin{abstract}
-  % This meta-paper describes the style to be used in articles and short papers
-  % for SBC conferences. For papers in English, you should add just an abstract
-  % while for the papers in Portuguese, we also ask for an abstract in
-  % Portuguese (``resumo''). In both cases, abstracts should not have more than
-  % 10 lines and must be in the first page of the paper.
+  Static visualization of spatio-temporal data via linearization often relies on fixed-geometry curves, neglecting relevant
+  data characteristics. This work presents an efficient, open-source library that implements and extends the Data-Driven
+  Space-Filling Curves method to the temporal domain, introducing alignment techniques to ensure visual continuity between
+  frames. Experiments indicate the effectiveness of the alignment in single-object scenarios, despite continuity limitations
+  in simultaneous multi-object contexts. Finally, autocorrelation metrics validate the spatial and data coherence trade-offs
+  described in the literature.
 \end{abstract}
      
 \begin{resumo} 
-  % Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-  % resumos de artigos para publicação nos anais das conferências organizadas
-  % pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-  % escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-  % Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  % não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  % página do artigo.
+  % A análise visual de dados espaço-temporais é fundamental para a compreensão de fenômenos dinâmicos.
+  % Uma das abordagens hoje é baseada na linearização do espaço para criar visualizações estáticas, criando
+  % imagens bidimensional onde um eixo representa o espaço linearizado e ou outro o tempo. Formas de linearizar
+  % incluem curvas de preenchimento de espaço (\textit{space-filling curves}) e já existem estudos que
+  % as usam no contexto espaço-temporal. Contudo, as curvas adotadas neles levam em conta uma geometrica fixa, como
+  % a curva de Hilbert. Este trabalho cria uma biblioteca que implementa e estende o método de curvas guiadas por dados
+  % \textit{Data-Driven Space-Filling Curves} para o contexto espaço temporal. Essa biblioteca é eficiente, de fácil reuso
+  % e adaptação. Neste trabalho também é explorado técnicas de alinhamento temporal para garantir a continuidade visual
+  % entre quadros consecutivos. A avaliação da proposta foi realizada por meio de experimentos com animações sintéticas e
+  % da aplicação de métricas de autocorrelação, demonstrando a eficácia do método em manter tanto a coerência dos dados
+  % quanto a coerência espacial na representação linearizada.
+  A visualização estática de dados espaço-temporais via linearização frequentemente utiliza curvas de geometria fixa,
+  ignorando características relevantes dos dados. Este trabalho apresenta uma biblioteca eficiente e de código aberto
+  que implementa e estende o método de curvas de preenchimento guiadas por dados (\textit{Data-Driven Space Filling Curves})
+  para o domínio temporal, introduzindo técnicas de alinhamento para garantir a continuidade visual entre quadros. Experimentos
+  indicam a eficácia do alinhamento em cenários com um objeto único, apesar de limitações de continuidade em contextos
+  com múltiplos objetos simultâneos. Por fim, métricas de autocorrelação validam os compromissos de coerência espacial e
+  de dados previstos na literatura.
+
+  
+
 \end{resumo}
 
 \section{Introdução}
+% Os dados espaço-temporais, como o clima de uma região ao longo do tempo ou um padrão que se
+% propaga ao longo do tempo, podem ser visualizados de diversas formas. A forma mais comum de analisar
+% um dado que vária com o tempo é no formato de um vídeo  ou uma sequência de quadros justapostos. Dados
+% postos nessa maneira são de fácil visualização. Porém, para análise, possui pontos negativos, como
+% a dificuldade de perceber objetos que aparecem temporariamente e a necessidade do usuário manter contexto
+% temporais para analisar a evolução temporal dos dados.
+
+Os dados espaço-temporais, como o clima de uma região ou um padrão de propagação, podem ser visualizados
+de diversas formas. A abordagem mais comum para analisar um dado que varia com o tempo é o formato de
+vídeo ou uma sequência de quadros justapostos. Embora dados dispostos dessa maneira sejam de fácil
+visualização inicial, eles apresentam limitações para tarefas de análise aprofundada.
+Dentre os pontos negativos, destacam-se a dificuldade de perceber objetos que aparecem temporariamente
+e a necessidade do usuário manter o contexto mental para compreender a evolução temporal dos dados.
+
+% Recentemente, houveram abordagens que utilizaram linearizações do espaço para representar estaticamente
+% dados temporais~\cite{franke:21, KoeppWeinkauf2022_TMTM}, em especial com curvas de preenchimento de
+% espaço (\textit{space-filling curves}).
+% A representação estática se dá por uma imagem bidimensional onde
+% o eixo vertical representa a linearização de todo espaço, enquanto o eixo horizontal representa o tempo.
+% Essa representação podem ser útil em casos que animações não podem ser usadas, como em impressões e em
+% como a dificuldade de perceber objetos que aparecem temporariamente e a necessidade do usuário manter contexto
+% temporais para analisar a evolução temporal dos dados.
+
+Recentemente, surgiram abordagens que utilizam linearizações do espaço para representar estaticamente dados
+temporais~\cite{franke:21, KoeppWeinkauf2022_TMTM}, em especial com curvas de preenchimento de espaço
+(\textit{space-filling curves}). A representação estática se dá por uma imagem bidimensional onde o eixo
+vertical representa a linearização de todo o espaço, enquanto o eixo horizontal representa o tempo. Essa
+representação é útil em casos onde animações não são viáveis, como em impressões estáticas.
+Contudo, as abordagens presentes na literatura  exploram dados
+espaço-temporais com curvas guiadas por dados~\cite{dafner:00,zhou:20}. Em particular, a abordagem
+\textit{data-driven}~\cite{zhou:20} geram curvas que possuem a
+propriedade de balancear a coerência dos dados com a coerência espacial, mantendo \textit{features} próximas
+em sua linearização, o que pode ser uma estratégia interessante para evitar descontinuidades visuais.
+
+% Contudo, as abordagens com curvas de preenchimento de espaço presentes na literatura
+% não abordam dados espaço temporais com curvas guiadas por dados.~\cite{dafner:00,zhou:20}. Estas curvas possuem a propriedade de
+% balancear a coerência dos dados bem como a coerência espacial, mantendo \textit{features} próximas em sua
+% linearização, podendo ser uma abordagem interessante que evite descontinuidades.
+
+Nesse contexto, este trabalho traz uma implementação eficiente, de fácil reuso e adaptação, do método
+\textit{Data-Driven Space-Filling Curve} para imagens estáticas, bem como uma expansão do seu uso para
+dados espaço-temporais. O objetivo é gerar imagens estáticas representativas do evento temporal como um todo.
+Com o intuito de melhorar a coerência visual da imagem resultante, foram propostas também formas de alinhamento
+temporal entre os quadros.
+
+
+% Este trabalho traz uma implementação eficiente de fácil reuso e adaptação do método guiado por dados
+% \textit{Data-Driven Space-Filling Curve} para imagens estáticas bem como uma expansão do seu uso para
+% dados espaço-temporais, gerando imagens estáticas representativas do evento temporal como um todo.
+% Este trabalho também implementa métricas avaliativas da coerência de dados e da coerência espacial
+% para a linearização. Também é realizado experimentos visuais com animações criadas sinteticamente.
+% Com o intuito de melhorar a coerência visual da imagem estática que representa todo o dado espaço-temporal,
+% foi proposto formas de alinhamento neste trabalho também.
+
+A avaliação da proposta ocorre por meio de experimentos visuais em animações sintéticas. Adicionalmente, este
+trabalho implementa métricas de autocorrelação para aferir a coerência
+espacial e dos dados na linearização resultante.
+
 
 \section{Trabalhos Relacionados}
+% -----------------------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------------------------
+
+% A visualização de dados temporais é um tópico explorado na literatura. Pe{\~n}a-Araya et al.~\cite{PenaAraya:20}
+% compara diferentes formas de visualização para diferentes atividades, são elas: animações, pequenos múltiplos e
+% glifos. Os resultados apontados nesse estudo indicam, entre outras coisas, que uma visão mais ampla de todo o evento
+% com a técnica de pequenos múltiplos é a melhor de forma geral entre elas. Isso é um indicativo que uma abordagem que
+% mostre vários dados temporais simultaneamente contribui para uma boa compreensão e análise, como com a linearização
+% do espaço em uma dimensão e o tempo na outra.
+
+A visualização de dados espaço-temporais é um tópico amplamente explorado na literatura. Peña-Araya et al.~\cite{PenaAraya:20}
+conduziram estudos comparativos entre diferentes técnicas, especificamente: animações, pequenos múltiplos (\textit{small multiples})
+e glifos. Os resultados indicam que, embora animações sejam eficazes para estimar direções, a visualização estática via pequenos
+múltiplos apresenta melhor desempenho geral para tarefas de análise e comparação. Isso corrobora a relevância de abordagens que
+permitem a visualização simultânea de múltiplos instantes temporais, tal qual a proposta de linearização do espaço em uma dimensão
+com o tempo na outra.
+
+% Curvas de preenchimento de espaço~\cite{sagan:94} são exploradas na literatura e David Hilbert inventou uma das mais famosas
+% delas na Ciência da computação~\cite{hilbert:1891}. A maioria dessas curvas lidam mais com formatos geométricos sem ligar
+% para o próprio dado em questão. Duas exceções a essa regra são as curvas definidas por Dafner et al.~\cite{dafner:00} e
+% Zhou et al.\cite{zhou:20}, que propoem curvas data aware.
+
+As curvas de preenchimento de espaço possuem fundamentos teóricos sólidos~\cite{sagan:94}, sendo a curva proposta por
+David Hilbert~\cite{hilbert:1891} uma das mais proeminentes na Ciência da Computação. A maioria dessas curvas tradicionais é
+construída com base em padrões geométricos fixos, sendo agnósticas ao conteúdo dos dados. Exceções importantes a essa regra
+são as curvas definidas por Dafner et al.~\cite{dafner:00} e Zhou et al.~\cite{zhou:20}, que propõem abordagens guiadas por dados,
+onde o caminho se adapta às características da imagem para preservar a coerência das informações. Enquanto Dafner et al. definem
+a construção de caminhos hamiltonianos focados na maximização da coerência dos dados, Zhou et al. expandem esse conceito ao
+introduzir mecanismos para balancear simultaneamente a coerência espacial.
+
+% Usar linearizações do espaço para representar dados temporais foi explorado por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM} e
+% por Franke et al.~\cite{franke:21}. Köpp e Weinkauf desenvolveram métodos próprios de linearização, enquanto Franke et al. usa
+% curvas de preenchimento como a de Hilbert, que não levam em conta o próprio conteúdo do dado.
+
+Recentemente, o uso de linearizações espaciais para representar dados temporais foi investigado por Franke et al.~\cite{franke:21}
+e por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}. Franke et al. utilizam projeções 1D baseadas em curvas clássicas, como a de
+Hilbert, que não consideram a distribuição dos dados na imagem. Por outro lado, Köpp e Weinkauf desenvolvem um método próprio
+baseado em topologia. Nota-se, portanto, que a aplicação de curvas guiadas por dados especificamente para o contexto de visualização
+de sequências temporais ainda é pouco explorada, motivando a abordagem deste trabalho.
 
 \section{Metodologia}
 
@@ -67,8 +180,8 @@ Universidade Federal de Pernambuco (UFPE) -- Recife, PE -- Brazil
 
 A abordagem proposta fundamenta-se na linearização de estruturas multidimensionais (2D ou 3D) em
 sequências unidimensionais (1D). Expandindo o conceito de curvas baseadas em contexto
-(\textit{Context-based Space-Filling Curves}) \cite{dafner:00}, utiliza-se a técnica de curvas de 
-preenchimento de espaço guiadas por dados (\textit{Data-Driven Space-Filling Curves}) \cite{zhou:20}.
+(\textit{Context-based Space-Filling Curves})~\cite{dafner:00}, utiliza-se a técnica de curvas de 
+preenchimento de espaço guiadas por dados (\textit{Data-Driven Space-Filling Curves})~\cite{zhou:20}.
 O núcleo do processamento estabelece um ciclo hamiltoniano que percorre integralmente a grade de pixels,
 com o objetivo de preservar simultaneamente a coerência espacial, referente a localidade geométrica do caminho,
 e a coerência dos dados, associada à localidade dos dados no caminho.
@@ -103,7 +216,7 @@ Dessa forma, o trabalho atua em duas frentes principais:
 % -----------------------------------------------------------------------------------------------
 
 % Para entender como funciona o método \textit{data-driven}, é preciso avaliar o seu \textit{context-based} desenvolvido por
-% Dafner et al \cite{dafner:00}. A ideia central começa no mapeamento 1 para 1 da imagem para o seu dual através
+% Dafner et al~\cite{dafner:00}. A ideia central começa no mapeamento 1 para 1 da imagem para o seu dual através
 % da construção de pequenos circuitos como mostrado na figura \ref{fig:small_circuits}.
 
 A compreensão do método \textit{data-driven} requer a análise preliminar da abordagem (\textit{Context-based})
@@ -133,7 +246,7 @@ algoritmo de Prim para a construção da MST.
 % A função proposta originalmente está descrito na equação \ref{eq:1}. Na equação, temos que o custo de de uma aresta
 % $W{(C_{i},C_{j})}$ representa o custo de adicionar o vértice $C_{j}$ à árvore geradora mínima em construção
 % cujo vertíce $C_{i}$ pertence a ela. Além disso, cada peso na equação \ref{eq:1} representam arestas no grafo original
-% e o peso de uma aresta é definido como a diferença entre seus extremos. Dafner et al \cite{dafner:00} define para uma aresta
+% e o peso de uma aresta é definido como a diferença entre seus extremos. Dafner et al~\cite{dafner:00} define para uma aresta
 % $e = (a, b)$, $w(e) = |a - b|$ e, para imagens com mais canais de cor, como imagens RGB, 
 % $w(e) = |a_{red} - b_{red}| + |a_{green} - b_{green}| + |a_{blue} - b_{blue}|$.
 % Os valores descritos na equação \ref{eq:1} podem ser melhor interpretados com a figura \ref{fig:context_weight}.
@@ -150,19 +263,19 @@ $w(e) = \sum_{k \in \{R,G,B\}} |a_k - b_k|$.
 % Dessa maneira, a abordagem \textit{context-based} gera linearizações que tentam maximizar a coerência de dados próximos.
 % Contudo, é um método que não considera a coerência espacial em sua construção. A abordagem \textit{data-driven}, por sua vez,
 % atinge isso pela introdução de uma nova função de custo enquanto aproveita de todos os demais conceitos utilizados pelo
-% artigo original \cite{dafner:00}.
+% artigo original~\cite{dafner:00}.
 
 Dessa maneira, a abordagem \textit{context-based} gera linearizações que priorizam a coerência dos dados. 
 Contudo, este método não considera explicitamente a coerência espacial durante a construção da curva.
 A abordagem \textit{data-driven}, detalhada por Zhou et al.~\cite{zhou:20}, soluciona essa limitação
 introduzindo uma nova função de custo composta, preservando, no entanto, a estrutura fundamental
-de mapeamento dual e MST proposta no artigo original \cite{dafner:00}.
+de mapeamento dual e MST proposta no artigo original~\cite{dafner:00}.
 
-A abordagem \textit{data-driven}, conforme proposto em \cite{zhou:20} utiliza a função de custo
+A abordagem \textit{data-driven}, conforme proposto em~\cite{zhou:20} utiliza a função de custo
 ponderada descrita na Equação \ref{eq:2}. Os componentes da equação são definidos como:
 
 % \begin{itemize}
-%   \item $N(C_i, C_j)$: a mesma função de custo de Dafner et al \cite{dafner:00} destacada em \ref{eq:1};
+%   \item $N(C_i, C_j)$: a mesma função de custo de Dafner et al~\cite{dafner:00} destacada em \ref{eq:1};
 %   \item $R_{\beta}(C_j)$: a distância geométrica entre $C_j$ e o o seu centro $S_{C_j}$, i.e, $||(Cj.x,Cj.y) - (S_{C_j}.x, S_{C_j}.y)||$;
 %   \item $\alpha$: peso percentual representando quanto a execução do algoritmo vai levar em conta a correlação espacial do caminho.
 %   Quanto maior, mais o algoritmo vai levar em conta a correlação espacial e menos a correlação dos dados;
@@ -350,7 +463,7 @@ alcançar propriedades algébricas interessantes, como demonstrado na Equação 
 \end{equation}
 
 Dessa maneira, observa-se que, para alcançar o mínimo de $f_\sigma$, é preciso encontrar os valores
-de $s$ e $\sigma$ que maximizem a correlação cruzada circular \cite{wang:19}, uma vez que os termos de soma quadrática 
+de $s$ e $\sigma$ que maximizem a correlação cruzada circular~\cite{wang:19}, uma vez que os termos de soma quadrática 
 são constantes e independem da rotação e da direção. Essa propriedade é fundamental pois, dado 
 um $\sigma \in \{0, 1\}$, a correlação pode ser calculada para todo valor de $s$ simultaneamente
 utilizando a Transformada Rápida de Fourier (FFT) em $O(N \log N)$. Como existem apenas duas
@@ -370,7 +483,7 @@ O ambiente de validação experimental foi construído sobre \textit{Jupyter Not
 rápida e visualização imediata dos resultados. Essa estrutura permitiu avaliar como a variação dos hiperparâmetros
 impacta o tempo de execução, a correlação entre quadros e a qualidade visual das curvas geradas.
 
-O código-fonte desenvolvido encontra-se disponível publicamente no repositório: \url{https://github.com/gabmei/TCC}.
+O código-fonte desenvolvido encontra-se disponível publicamente no repositório: \url{https://github.com/gabmei/spatio-temporal-data-driven-sfc}.
 
 \section{Experimentos}
 % -----------------------------------------------------------------------------------------------
@@ -400,8 +513,8 @@ para valores em ponto flutuante no intervalo $[0.0, 1.0]$.
 
 \subsubsection{Volumes do \textit{Open Scientific Visualization Datasets}}
 Para a validação experimental, foram utilizados diversos volumes de dados disponíveis na coleção
-\textit{Open Scientific Visualization Datasets} \cite{klacansky:osvd}, amplamente adotada na literatura,
-incluindo datasets usaods por Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM} e por Zhou et al.~\cite{zhou:20}
+\textit{Open Scientific Visualization Datasets}~\cite{klacansky:osvd}, amplamente adotada na literatura,
+incluindo datasets usaods por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM} e por Zhou et al.~\cite{zhou:20}
 em seus respectivos trabalhos.
 As especificações técnicas destes volumes encontram-se na Tabela \ref{tab:openscivis}.
 Cortes transversais ao longo do eixo $z$ também são apresentados na Figura \ref{fig:openscivis_slices}, destacando
@@ -475,13 +588,13 @@ Nucleon          & $41  \times  41 \times  41$                & uint8       \\
         
     \end{minipage} % Fim do wrapper
     
-    \caption{Cortes transversais dos datasets utilizados nos experimentos, obtidos do repositório Open SciVis \cite{klacansky:osvd}.}
+    \caption{Cortes transversais dos datasets utilizados nos experimentos, obtidos do repositório Open SciVis~\cite{klacansky:osvd}.}
     \label{fig:openscivis_slices}
 \end{figure}
 
 \subsubsection{Imagens de Teste}
 Para a validação do método em imagens estáticas, foram adotadas as figuras sintéticas propostas por
-Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}. Estes dados possuem dimensões $128 \times 128$ com
+Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}. Estes dados possuem dimensões $128 \times 128$ com
 valores em ponto flutuante. Neste trabalho, tais imagens foram utilizadas para testar como diferentes distribuições de dados
 influenciam o comportamento da curva e como a variação de hiperparâmetros afeta o padrão de preenchimento resultante.
 A Figura \ref{fig:koepp_images} ilustra esses padrões.
@@ -520,7 +633,7 @@ A Figura \ref{fig:koepp_images} ilustra esses padrões.
         \caption{Skew normal distribution}
     \end{subfigure}
     
-    \caption{Imagens de teste de Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}}
+    \caption{Imagens de teste de Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}}
     \label{fig:koepp_images}
 \end{figure}
 
@@ -538,7 +651,7 @@ quadros selecionados destas animações. Os cenários são descritos a seguir:
 \begin{itemize}
   \item \textbf{Distribuição normal:} Uma distribuição normal em movimento diagonal, cuja intensidade surge e desaparece gradativamente;
   \item \textbf{Duas distribuições:} Duas distribuições normais, sendo uma estática de maior porte e outra menor em movimento diagonal, também com variação gradativa de intensidade;
-  \item \textbf{Anel em expansão:} Um anel que cresce gradativamente em raio e intensidade. Este experimento replica o cenário proposto por Franke et al.~\cite{franke:21} e utilizado por Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}.
+  \item \textbf{Anel em expansão:} Um anel que cresce gradativamente em raio e intensidade. Este experimento replica o cenário proposto por Franke et al.~\cite{franke:21} e utilizado por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 \end{itemize}
 
 \begin{figure}[ht]
@@ -594,13 +707,13 @@ quadros selecionados destas animações. Os cenários são descritos a seguir:
 % Para avaliar como a implementação data-driven se comporta ao variar seus hiperparâmetros e comparar com outras
 % curvas de preenchimento, foi adotado a imagem Nucleon
 % presente na Figura \ref{fig:openscivis_slices} (f), imagem usada na literatura para testes similares por tanto Zhou et al.
-% \cite{zhou:20} quanto Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}.
+%~\cite{zhou:20} quanto Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 
 Inicialmente, avalia-se a abordagem proposta em comparação com curvas de preenchimento estabelecidas na
 literatura, especificamente \textit{Hilbert}, \textit{Scanline} e \textit{Context-based}. Para este comparativo, foi adotada a
 imagem \textit{Nucleon} da Figura \ref{fig:openscivis_slices}(f), um dataset de referência frequentemente utilizado
 para validação de linearizações em trabalhos correlatos, como os de Zhou et al.~\cite{zhou:20} e Köpp e
-Weinkauf \cite{KoeppWeinkauf2022_TMTM}.
+Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 
 % Depois, é realizado a linearização das imagens presentes na Figura \ref{fig:koepp_images} e para ver visualmente quão
 % sensível é a implementação data-driven ao alterar seus hiperparâmetros.
@@ -688,7 +801,7 @@ o eixo $y$ exibe a média dos valores de correlação computados na janela de $-
 % na Figura \ref{fig:matrix_comparison_side} (c), que mostra as curvas de preenchimento propriamente. Nota-se que para a
 % implementação data-driven, as curvas tendem a ser muito mais sinuosas devido a escolha de seus hiperparâmetros, enquanto
 % a implementação context-base costuma a ter caminhos muito em linha reta. Esse resultado pode ser visto também na implementação
-% de Zhou et al \cite{zhou:20}. Isso acontece, pois na implementação do autor e na minha, em caso de empates na formula
+% de Zhou et al~\cite{zhou:20}. Isso acontece, pois na implementação do autor e na minha, em caso de empates na formula
 % de distância presente na Equação \ref{eq:2} durante o algoritmo de Prim, direções tem precedencia entre si. Embora, as
 % implementações difiram nessas precedencias, resultados semelhantes são encontrados.
 
@@ -775,7 +888,7 @@ precedência das direções (norte, sul, leste, oeste) atua como critério de de
         \end{tabular}
 
         % A legenda agora está presa dentro da minipage de 0.9\linewidth
-        \caption{Análise de sensibilidade aos hiperparâmetros sobre os padrões sintéticos de Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM} presentes na Figura \ref{fig:koepp_images}. As colunas evidenciam o impacto das variações de $\alpha$ e $\beta$ na linearização resultante.}        \label{fig:sensitivity_full}
+        \caption{Análise de sensibilidade aos hiperparâmetros sobre os padrões sintéticos de Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM} presentes na Figura \ref{fig:koepp_images}. As colunas evidenciam o impacto das variações de $\alpha$ e $\beta$ na linearização resultante.}        \label{fig:sensitivity_full}
         
     \end{minipage}
 \end{figure}
@@ -1018,7 +1131,7 @@ de alinhamento (Sem alinhamento, Normas L1 e L2), mantendo-se fixo o hiperparâm
 % resultantes para cada técnica de alinhamento e configuração do hiperparâmetro $\alpha$. É perceptível que independente
 % da configuração aplicado ao \textit{dataset}, a técnica \textit{data-driven} fragmenta as
 % \textit{features} presente nos dados. Em especial, observa-se que aumentar o fator espacial causa também um aumento
-% nessa fragmentação. Assim como apontado por Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}, pode ser observado na
+% nessa fragmentação. Assim como apontado por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}, pode ser observado na
 % Figura \ref{fig:anim_two_features} que em todas as configurações não é possível inferir pela linearização
 % a quantidade de \textit{features} presentes nos dados devido a essa fragmentação.
 
@@ -1044,7 +1157,7 @@ sob maior influência do fator espacial $\alpha$ da Equação \ref{eq:2}.
 Além disso, é importante notar que cada quadro da animação representa um circuito hamiltoniano fechado. Dessa forma,
 aplicar uma mesma rotação cíclica nos quadros preserva a coerência do alinhamento resultante da mesma maneira. Essa
 propriedade é demonstrada na Figura \ref{fig:compare_expanding_ring}, onde uma versão rotacionada do resultado
-obtido é comparada diretamente com o padrão da literatura reportado por Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}.
+obtido é comparada diretamente com o padrão da literatura reportado por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 
 \begin{figure}[htbp]
     \centering
@@ -1065,7 +1178,7 @@ obtido é comparada diretamente com o padrão da literatura reportado por Köpp 
     \begin{subfigure}[c]{0.32\linewidth}
         \centering
         \includegraphics[width=\linewidth]{images/animations/expanding_ring_kopp.png}
-        \caption{Referência de Köpp e Weinkauf \cite{KoeppWeinkauf2022_TMTM}}
+        \caption{Referência de Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}}
         \label{subfig:kopp_ring}
     \end{subfigure}
     
@@ -1156,7 +1269,7 @@ linearização \textit{data-driven}, expandindo sua aplicação para o domínio 
 híbrida adotada permitiu combinar a eficiência de C++ para a implementação dos algoritmos utilizados com a
 flexibilidade de Python para a validação de hiperparâmetros e métricas de qualidade.
 
-Os experimentos realizados confirmam o \textit{trade-off} imposto pelo fator de regularização espacial
+Os experimentos confirmam o \textit{trade-off} imposto pelo fator de regularização espacial
 $\alpha$, onde valores maiores promovem curvas de preenchimento de espaço em blocos compactos, em detrimento da
 coerência dos dados.
 
@@ -1190,112 +1303,6 @@ Como direções para trabalhos futuros, sugere-se:
 
 Por fim, o código-fonte está disponível e é facilmente customizável, oferecendo à comunidade uma
 ferramenta para exploração de técnicas de linearização e visualização de dados espaço-temporais.
-
-% \section{General Information}
-
-% All full papers and posters (short papers) submitted to some SBC conference,
-% including any supporting documents, should be written in English or in
-% Portuguese. The format paper should be A4 with single column, 3.5 cm for upper
-% margin, 2.5 cm for bottom margin and 3.0 cm for lateral margins, without
-% headers or footers. The main font must be Times, 12 point nominal size, with 6
-% points of space before each paragraph. Page numbers must be suppressed.
-
-% Full papers must respect the page limits defined by the conference.
-% Conferences that publish just abstracts ask for \textbf{one}-page texts.
-
-% \section{First Page} \label{sec:firstpage}
-
-% The first page must display the paper title, the name and address of the
-% authors, the abstract in English and ``resumo'' in Portuguese (``resumos'' are
-% required only for papers written in Portuguese). The title must be centered
-% over the whole page, in 16 point boldface font and with 12 points of space
-% before itself. Author names must be centered in 12 point font, bold, all of
-% them disposed in the same line, separated by commas and with 12 points of
-% space after the title. Addresses must be centered in 12 point font, also with
-% 12 points of space after the authors' names. E-mail addresses should be
-% written using font Courier New, 10 point nominal size, with 6 points of space
-% before and 6 points of space after.
-
-% The abstract and ``resumo'' (if is the case) must be in 12 point Times font,
-% indented 0.8cm on both sides. The word \textbf{Abstract} and \textbf{Resumo},
-% should be written in boldface and must precede the text.
-
-% \section{CD-ROMs and Printed Proceedings}
-
-% In some conferences, the papers are published on CD-ROM while only the
-% abstract is published in the printed Proceedings. In this case, authors are
-% invited to prepare two final versions of the paper. One, complete, to be
-% published on the CD and the other, containing only the first page, with
-% abstract and ``resumo'' (for papers in Portuguese).
-
-% \section{Sections and Paragraphs}
-
-% Section titles must be in boldface, 13pt, flush left. There should be an extra
-% 12 pt of space before each title. Section numbering is optional. The first
-% paragraph of each section should not be indented, while the first lines of
-% subsequent paragraphs should be indented by 1.27 cm.
-
-% \subsection{Subsections}
-
-% The subsection titles must be in boldface, 12pt, flush left.
-
-% \section{Figures and Captions}\label{sec:figs}
-
-
-% Figure and table captions should be centered if less than one line
-% (Figure~\ref{fig:exampleFig1}), otherwise justified and indented by 0.8cm on
-% both margins, as shown in Figure~\ref{fig:exampleFig2}. The caption font must
-% be Helvetica, 10 point, boldface, with 6 points of space before and after each
-% caption.
-
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=.5\textwidth]{fig1.jpg}
-% \caption{A typical figure}
-% \label{fig:exampleFig1}
-% \end{figure}
-
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=.3\textwidth]{fig2.jpg}
-% \caption{This figure is an example of a figure caption taking more than one
-%   line and justified considering margins mentioned in Section~\ref{sec:figs}.}
-% \label{fig:exampleFig2}
-% \end{figure}
-
-% In tables, try to avoid the use of colored or shaded backgrounds, and avoid
-% thick, doubled, or unnecessary framing lines. When reporting empirical data,
-% do not use more decimal digits than warranted by their precision and
-% reproducibility. Table caption must be placed before the table (see Table 1)
-% and the font used must also be Helvetica, 10 point, boldface, with 6 points of
-% space before and after each caption.
-
-% \begin{table}[ht]
-% \centering
-% \caption{Variables to be considered on the evaluation of interaction
-%   techniques}
-% \label{tab:exTable1}
-% \includegraphics[width=.7\textwidth]{table.jpg}
-% \end{table}
-
-% \section{Images}
-
-% All images and illustrations should be in black-and-white, or gray tones,
-% excepting for the papers that will be electronically available (on CD-ROMs,
-% internet, etc.). The image resolution on paper should be about 600 dpi for
-% black-and-white images, and 150-300 dpi for grayscale images.  Do not include
-% images with excessive resolution, as they may take hours to print, without any
-% visible difference in the result. 
-
-% \section{References}
-
-% Bibliographic references must be unambiguous and uniform.  We recommend giving
-% the author names references in brackets, e.g. \cite{knuth:84},
-% \cite{boulic:91}, and \cite{smith:99}.
-
-% The references must be listed using 12 point font size, with 6 points of space
-% before each reference. The first line of each reference should not be
-% indented, while the subsequent should be indented by 0.5 cm.
 
 \printbibliography
 % \bibliographystyle{sbc}
