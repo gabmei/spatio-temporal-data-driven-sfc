@@ -37,8 +37,7 @@ Universidade Federal de Pernambuco (UFPE) -- Recife, PE -- Brazil
 \maketitle
 
 \begin{abstract}
-  Static visualization of spatio-temporal data via linearization often relies on fixed-geometry curves, neglecting relevant
-  data characteristics. This work presents an efficient, open-source library that implements and extends the Data-Driven
+  This work presents an efficient, open-source library that implements and extends the Data-Driven
   Space-Filling Curves method to the temporal domain, introducing alignment techniques to ensure visual continuity between
   frames. Experiments indicate the effectiveness of the alignment in single-object scenarios, despite continuity limitations
   in simultaneous multi-object contexts. Finally, autocorrelation metrics validate the spatial and data coherence trade-offs
@@ -57,8 +56,7 @@ Universidade Federal de Pernambuco (UFPE) -- Recife, PE -- Brazil
   % entre quadros consecutivos. A avaliação da proposta foi realizada por meio de experimentos com animações sintéticas e
   % da aplicação de métricas de autocorrelação, demonstrando a eficácia do método em manter tanto a coerência dos dados
   % quanto a coerência espacial na representação linearizada.
-  A visualização estática de dados espaço-temporais via linearização frequentemente utiliza curvas de geometria fixa,
-  ignorando características relevantes dos dados. Este trabalho apresenta uma biblioteca eficiente e de código aberto
+  Este trabalho apresenta uma biblioteca eficiente e de código aberto
   que implementa e estende o método de curvas de preenchimento guiadas por dados (\textit{Data-Driven Space Filling Curves})
   para o domínio temporal, introduzindo técnicas de alinhamento para garantir a continuidade visual entre quadros. Experimentos
   indicam a eficácia do alinhamento em cenários com um objeto único, apesar de limitações de continuidade em contextos
@@ -82,7 +80,7 @@ de diversas formas. A abordagem mais comum para analisar um dado que varia com o
 vídeo ou uma sequência de quadros justapostos. Embora dados dispostos dessa maneira sejam de fácil
 visualização inicial, eles apresentam limitações para tarefas de análise aprofundada.
 Dentre os pontos negativos, destacam-se a dificuldade de perceber objetos que aparecem temporariamente
-e a necessidade do usuário manter o contexto mental para compreender a evolução temporal dos dados.
+e a necessidade do usuário manter o contexto mental para compreender a evolução temporal dos dados~\cite{PenaAraya:20}.
 
 % Recentemente, houveram abordagens que utilizaram linearizações do espaço para representar estaticamente
 % dados temporais~\cite{franke:21, KoeppWeinkauf2022_TMTM}, em especial com curvas de preenchimento de
@@ -94,26 +92,67 @@ e a necessidade do usuário manter o contexto mental para compreender a evoluç�
 % temporais para analisar a evolução temporal dos dados.
 
 Recentemente, surgiram abordagens que utilizam linearizações do espaço para representar estaticamente dados
-temporais~\cite{franke:21, KoeppWeinkauf2022_TMTM}, em especial com curvas de preenchimento de espaço
-(\textit{space-filling curves}). A representação estática se dá por uma imagem bidimensional onde o eixo
-vertical representa a linearização de todo o espaço, enquanto o eixo horizontal representa o tempo. Essa
-representação é útil em casos onde animações não são viáveis, como em impressões estáticas.
-Contudo, as abordagens presentes na literatura  exploram dados
-espaço-temporais com curvas guiadas por dados~\cite{dafner:00,zhou:20}. Em particular, a abordagem
-\textit{data-driven}~\cite{zhou:20} geram curvas que possuem a
-propriedade de balancear a coerência dos dados com a coerência espacial, mantendo \textit{features} próximas
-em sua linearização, o que pode ser uma estratégia interessante para evitar descontinuidades visuais.
+temporais~\cite{franke:21, KoeppWeinkauf2022_TMTM}, em especial as baseadas em curvas de preenchimento de espaço (CPE).
+As CPEs percorrem todo o espaço da imagem, permitindo que ela seja interpretada de maneira unidimensional, conforme
+detalhado na Figura \ref{fig:frame_linearization}. Para dados espaço-temporais, múltiplos quadros são processados
+sequencialmente e suas linearizações resultantes são justapostas. O resultado é uma imagem bidimensional onde o eixo
+vertical representa o espaço linearizado e o eixo horizontal representa o tempo. Essa representação é particularmente
+útil em casos onde animações não são viáveis, como em impressões estáticas.
+
+\begin{figure}[ht]
+    \centering
+    % Define a altura. Se ainda der erro de overfull, reduza para 5.0cm
+    \def\comumheight{5.3cm} 
+
+    % --- Imagem 1 (Quadrada) ---
+    % Aumentei para 0.40 para caber a imagem de 5cm+
+    \begin{subfigure}[b]{0.40\textwidth} 
+        \centering
+        \includegraphics[height=\comumheight, keepaspectratio]{images/nucleon_comparison/nucleon_center_slice_2.png}
+        \caption{} % Gera apenas (a)
+        \label{fig:original_photo}
+    \end{subfigure}
+    \hfill
+    % --- Imagem 2 (Quadrada) ---
+    \begin{subfigure}[b]{0.40\textwidth}
+        \centering
+        \includegraphics[height=\comumheight, keepaspectratio]{images/nucleon_comparison/context_base_traversal_2.png}
+        \caption{} % Gera apenas (b)
+        \label{fig:spc_traversal}
+    \end{subfigure}
+    \hfill
+    % --- Imagem 3 (Fina) ---
+    % Reduzi para 0.15 pois a imagem é muito fina, sobra espaço aqui
+    \begin{subfigure}[b]{0.15\textwidth}
+        \centering
+        \includegraphics[height=\comumheight, keepaspectratio]{images/nucleon_comparison/context_base_frame_visualization_2.png}
+        \caption{} % Gera apenas (c)
+        \label{fig:linear_visualization}
+    \end{subfigure}
+
+    \caption{Processo de linearização de uma imagem: (a) Imagem original; (b) Caminho da CPE; (c) Visualização linearizada disposta verticalmente.}
+    \label{fig:frame_linearization}
+\end{figure}
 
 % Contudo, as abordagens com curvas de preenchimento de espaço presentes na literatura
 % não abordam dados espaço temporais com curvas guiadas por dados.~\cite{dafner:00,zhou:20}. Estas curvas possuem a propriedade de
 % balancear a coerência dos dados bem como a coerência espacial, mantendo \textit{features} próximas em sua
 % linearização, podendo ser uma abordagem interessante que evite descontinuidades.
 
-Nesse contexto, este trabalho traz uma implementação eficiente, de fácil reuso e adaptação, do método
-\textit{Data-Driven Space-Filling Curve} para imagens estáticas, bem como uma expansão do seu uso para
-dados espaço-temporais. O objetivo é gerar imagens estáticas representativas do evento temporal como um todo.
-Com o intuito de melhorar a coerência visual da imagem resultante, foram propostas também formas de alinhamento
-temporal entre os quadros.
+Contudo, as abordagens presentes na literatura exploram dados espaço-temporais majoritariamente com CPEs clássicas,
+baseadas em padrões geométricos fixos~\cite{franke:21}. Nesse contexto, este trabalho apresenta uma implementação
+eficiente, de fácil reuso e adaptação, do método \textit{Data-Driven Space-Filling Curves}~\cite{zhou:20}, expandindo
+seu uso para o domínio espaço-temporal. Diferente das abordagens clássicas, esta gera CPEs que balanceiam a
+coerência dos dados com a coerência espacial, mantendo \textit{features} similares próximas na linearização,
+o que constitui uma estratégia promissora para reduzir a descontinuidade visual.
+
+
+Com o objetivo de aprimorar a coerência visual da imagem resultante, foram propostas também técnicas de alinhamento
+temporal entre os quadros, visto que a linearização independente de cada quadro pode introduzir descontinuidades,
+como ilustrado na Figura \ref{fig:aligmnet_need}. A avaliação da proposta ocorre por meio de experimentos visuais
+em animações sintéticas. Adicionalmente, este
+trabalho implementa métricas de autocorrelação para aferir a coerência
+espacial e dos dados na linearização resultante.
 
 
 % Este trabalho traz uma implementação eficiente de fácil reuso e adaptação do método guiado por dados
@@ -124,9 +163,28 @@ temporal entre os quadros.
 % Com o intuito de melhorar a coerência visual da imagem estática que representa todo o dado espaço-temporal,
 % foi proposto formas de alinhamento neste trabalho também.
 
-A avaliação da proposta ocorre por meio de experimentos visuais em animações sintéticas. Adicionalmente, este
-trabalho implementa métricas de autocorrelação para aferir a coerência
-espacial e dos dados na linearização resultante.
+
+
+\begin{figure}[ht]
+    \centering
+    \captionsetup[subfigure]{}
+    
+    % --- Imagem 1 ---
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/temporal_disalignment.png}
+        \caption{Sem alinhamento} 
+    \end{subfigure}%
+    \hfill
+    % --- Imagem 2 ---
+    \begin{subfigure}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/temporal_alignment.png}
+        \caption{Com alinhamento}
+    \end{subfigure}%
+    \caption{Impacto do alinhamento temporal na linearização. Parte da animação detalhada na Figura \ref{subfig:moving_normal}.}
+    \label{fig:aligmnet_need}
+\end{figure}
 
 
 \section{Trabalhos Relacionados}
@@ -154,7 +212,7 @@ com o tempo na outra.
 % Zhou et al.\cite{zhou:20}, que propoem curvas data aware.
 
 As curvas de preenchimento de espaço possuem fundamentos teóricos sólidos~\cite{sagan:94}, sendo a curva proposta por
-David Hilbert~\cite{hilbert:1891} uma das mais proeminentes na Ciência da Computação. A maioria dessas curvas tradicionais é
+David Hilbert~\cite{hilbert:1891} uma das mais famosas na Ciência da Computação. A maioria dessas curvas tradicionais é
 construída com base em padrões geométricos fixos, sendo agnósticas ao conteúdo dos dados. Exceções importantes a essa regra
 são as curvas definidas por Dafner et al.~\cite{dafner:00} e Zhou et al.~\cite{zhou:20}, que propõem abordagens guiadas por dados,
 onde o caminho se adapta às características da imagem para preservar a coerência das informações. Enquanto Dafner et al. definem
@@ -167,47 +225,67 @@ introduzir mecanismos para balancear simultaneamente a coerência espacial.
 
 Recentemente, o uso de linearizações espaciais para representar dados temporais foi investigado por Franke et al.~\cite{franke:21}
 e por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}. Franke et al. utilizam projeções 1D baseadas em curvas clássicas, como a de
-Hilbert, que não consideram a distribuição dos dados na imagem. Por outro lado, Köpp e Weinkauf desenvolvem um método próprio
+Hilbert, que não consideram a distribuição dos dados na imagem. Por outro lado, Köpp e Weinkauf desenvolvem um método
 baseado em topologia. Nota-se, portanto, que a aplicação de curvas guiadas por dados especificamente para o contexto de visualização
 de sequências temporais ainda é pouco explorada, motivando a abordagem deste trabalho.
 
 \section{Metodologia}
+% -----------------------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------------------------
+Nesta seção serão abordadas as técnicas implementadas e adaptadas neste trabalho para a
+linearização e visualização de dados espaço-temporais.
+
 
 \subsection{Visão Geral}
 % -----------------------------------------------------------------------------------------------
 % -----------------------------------------------------------------------------------------------
 % -----------------------------------------------------------------------------------------------
 
-A abordagem proposta fundamenta-se na linearização de estruturas multidimensionais (2D ou 3D) em
-sequências unidimensionais (1D). Expandindo o conceito de curvas baseadas em contexto
-(\textit{Context-based Space-Filling Curves})~\cite{dafner:00}, utiliza-se a técnica de curvas de 
-preenchimento de espaço guiadas por dados (\textit{Data-Driven Space-Filling Curves})~\cite{zhou:20}.
-O núcleo do processamento estabelece um ciclo hamiltoniano que percorre integralmente a grade de pixels,
-com o objetivo de preservar simultaneamente a coerência espacial, referente a localidade geométrica do caminho,
-e a coerência dos dados, associada à localidade dos dados no caminho.
+A abordagem proposta fundamenta-se na linearização de estruturas multidimensionais (2D ou 3D) em sequências
+unidimensionais (1D). Expandindo o conceito de CPEs baseadas em contexto
+(\textit{Context-based Space-Filling Curves})~\cite{dafner:00}, utiliza-se a técnica de CPEs guiadas por
+dados (\textit{Data-Driven Space-Filling Curves})~\cite{zhou:20}. O núcleo do processamento estabelece
+um ciclo hamiltoniano que percorre integralmente a grade de pixels, com o objetivo de preservar
+simultaneamente a coerência espacial, referente à localidade geométrica do caminho, e a coerência dos dados,
+associada à localidade dos dados no caminho.
 
-Para viabilizar a implementação e a análise experimental, desenvolveu-se uma arquitetura de software
-híbrida entre C++ e Python. A metodologia trata imagens estáticas no formato $H \times W$ (2D) ou $H \times W \times C$ (3D).
-Analogamente, vídeos são processados como uma sequência de imagens estáticas do tipo $F \times H \times W$ ou $F \times H \times W \times C$,
-onde os parâmetros são definidos como:
+O processamento de dados espaço-temporais ocorre, inicialmente, pela linearização independente de cada quadro.
+No entanto, curvas de preenchimento de espaço geradas de forma isolada para quadros consecutivos podem apresentar
+variações topológicas abruptas, prejudicando a continuidade visual. Para mitigar esse problema, o sistema realiza
+técnicas de alinhamento temporal, visando maximizar a correlação estrutural entre as curvas de quadros adjacentes.
+O fluxograma completo do processo, incluindo a etapa de alinhamento, é apresentado na Figura \ref{fig:aligment_pipeline}.
 
-\begin{itemize}
-    \item $F$: quantidade de quadros do vídeo;
-    \item $H$: altura da imagem (número de linhas);
-    \item $W$: largura da imagem (número de colunas);
-    \item $C$: número de canais de cor.
-\end{itemize}
+\begin{figure}[ht]
+    \centering
 
-O processamento de um vídeo ocorre, inicialmente, pela linearização independente de cada quadro.
-No entanto, curvas geradas de forma isolada para quadros consecutivos podem apresentar variações
-topológicas abruptas, prejudicando a coerência temporal. Para mitigar esse problema, o sistema implementa
-técnicas de alinhamento temporal, visando maximizar a correlação estrutural entre as curvas de frames
-adjacentes.
+    % --- Imagem 1 ---
+    \begin{subfigure}[t]{0.35\textwidth}
+        \centering
+        \includegraphics[height=4.2cm, keepaspectratio]{images/pipeline/frames.png}
+        \caption{Dado espaço-temporal} 
+    \end{subfigure}%
+    \hfill
+    % --- Imagem 2 ---
+    \begin{subfigure}[t]{0.31\textwidth}
+        \centering
+        \includegraphics[height=4.8cm, keepaspectratio]{images/pipeline/disaligment.png}
+        \caption{Linearização}
+    \end{subfigure}%
+    % --- Imagem 3 ---
+    \begin{subfigure}[t]{0.31\textwidth}
+        \centering
+        \includegraphics[height=4.8cm, keepaspectratio]{images/pipeline/aligment.png}
+        \caption{Alinhamento}
+    \end{subfigure}%
+    \caption{Fluxograma do método proposto: (a) Entrada dos dados, (b) Linearização inicial e (c) Alinhamento temporal.}
+    \label{fig:aligment_pipeline}
+\end{figure}
 
 Dessa forma, o trabalho atua em duas frentes principais:
 \begin{itemize}
     \item \textbf{Imagens:} Implementação modular e reprodutível do método \textit{data-driven} descrito por Zhou et al.~\cite{zhou:20} para grades regulares, visando a validação dos resultados teóricos;
-    \item \textbf{Vídeos:} Investigação e avaliação de técnicas de alinhamento entre quadros para garantir a coerência temporal após a linearização individual de cada quadro do vídeo.
+    \item \textbf{Dados espaço-temporais:} Investigação e avaliação de técnicas de alinhamento entre quadros para garantir a coerência temporal após a linearização individual de cada quadro.
 \end{itemize}
 
 \subsection{O método de linearização \textit{data-driven}}
@@ -219,10 +297,20 @@ Dessa forma, o trabalho atua em duas frentes principais:
 % Dafner et al~\cite{dafner:00}. A ideia central começa no mapeamento 1 para 1 da imagem para o seu dual através
 % da construção de pequenos circuitos como mostrado na figura \ref{fig:small_circuits}.
 
-A compreensão do método \textit{data-driven} requer a análise preliminar da abordagem (\textit{Context-based})
-proposta por Dafner et al.~\cite{dafner:00}. O conceito central fundamenta-se no mapeamento da
-imagem original para o seu grafo dual, realizado através da construção de pequenos circuitos,
-conforme ilustrado na Figura \ref{fig:small_circuits}.
+Esta etapa detalha o funcionamento do método \textit{data-driven}, utilizado na linearização de cada quadro.
+Diferentemente de curvas de preenchimento de espaço com geometria fixa, como a curva de Hilbert, este método
+considera os valores dos dados durante a construção do caminho. O objetivo fundamental é maximizar a
+autocorrelação na sequência unidimensional resultante, mantendo dados com valores semelhantes próximos na
+linearização, sem sacrificar completamente a localidade espacial.
+
+A compreensão do método \textit{data-driven} requer a análise preliminar da abordagem baseada em
+contexto (\textit{Context-based}) proposta por Dafner et al.~\cite{dafner:00}. O conceito central fundamenta-se
+no mapeamento da imagem original para o seu grafo dual, realizado através da construção de pequenos circuitos,
+conforme ilustrado na Figura \ref{fig:small_circuits}. Após esse mapeamento, observa-se que uma árvore geradora
+no grafo dual equivale a um ciclo hamiltoniano no grafo original. Dessa forma, busca-se definir uma função de peso
+para as arestas do grafo dual que considere os valores dos pixels. Com essa função, constrói-se uma
+Árvore Geradora Mínima (MST) no grafo dual para, subsequentemente, recuperar o ciclo hamiltoniano no grafo original.
+Para a construção da MST, adotou-se o algoritmo de Prim.
 
 \begin{figure}[htbp]
     \centering
@@ -237,12 +325,6 @@ conforme ilustrado na Figura \ref{fig:small_circuits}.
 % geradora mínima no grafo dual para então recuperar o ciclo hamiltoniano no grafo original. Em específico, foi adotado
 % o algoritmo de Prim.
 
-Após esse mapeamento, observa-se que uma árvore geradora no grafo dual equivale a um ciclo hamiltoniano no grafo
-original. Dessa forma, busca-se definir uma função de peso para as arestas do grafo dual que considere os valores
-dos pixels da imagem. A partir dessa ponderação, constrói-se uma Árvore Geradora Mínima (MST)
-no grafo dual para, subsequentemente, recuperar o ciclo hamiltoniano no grafo original. Nesta implementação, adotou-se o
-algoritmo de Prim para a construção da MST.
-
 % A função proposta originalmente está descrito na equação \ref{eq:1}. Na equação, temos que o custo de de uma aresta
 % $W{(C_{i},C_{j})}$ representa o custo de adicionar o vértice $C_{j}$ à árvore geradora mínima em construção
 % cujo vertíce $C_{i}$ pertence a ela. Além disso, cada peso na equação \ref{eq:1} representam arestas no grafo original
@@ -251,28 +333,40 @@ algoritmo de Prim para a construção da MST.
 % $w(e) = |a_{red} - b_{red}| + |a_{green} - b_{green}| + |a_{blue} - b_{blue}|$.
 % Os valores descritos na equação \ref{eq:1} podem ser melhor interpretados com a figura \ref{fig:context_weight}.
 
-A função de custo originalmente proposta é descrita na Equação \ref{eq:1}. 
-Nela, $W(C_{i}, C_{j})$ representa o custo de conectar o vértice $C_{j}$ à árvore geradora, 
-partindo de um vértice $C_{i}$ já pertencente a ela. As variáveis da equação $(u, w, x, y, z, e, f)$ 
-correspondem aos pesos das arestas no grafo original (ver Figura \ref{fig:context_weight}). 
-O peso de cada aresta é definido pela diferença absoluta entre os valores dos pixels em seus extremos. 
-Segundo Dafner et al.~\cite{dafner:00}, para uma aresta $e=(a, b)$, tem-se $w(e)=|a - b|$. 
-Para imagens coloridas (RGB), a diferença é a soma das diferenças absolutas de cada canal: 
-$w(e) = \sum_{k \in \{R,G,B\}} |a_k - b_k|$.
+A função de custo originalmente proposta é descrita na Equação \ref{eq:1}. Nela, $W(C_{i}, C_{j})$
+representa o custo de conectar o vértice $C_{j}$ à árvore geradora, partindo de um vértice $C_{i}$
+já pertencente a ela. As variáveis $(u, w, x, y, z, e, f)$ correspondem aos pesos das arestas no
+grafo original que podem ser visualizados na Figura \ref{fig:context_weight}. O peso de cada aresta é definido
+pela diferença absoluta entre os valores dos pixels em seus extremos. Segundo Dafner et al.~\cite{dafner:00},
+para uma aresta $e=(a, b)$, tem-se $w(e)=|a - b|$. Para imagens coloridas, utiliza-se a soma das diferenças
+absolutas de cada canal $c$: $w(e) = \sum_{c} |a_c - b_c|$.
+
+\begin{equation} \label{eq:1}
+    W{(C_{i},C_{j})} = |u| + |w| + |x| + |y| + |z| - |e| - |f|
+\end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.35\textwidth]{images/weight_values_context_based.PNG}
+    \caption{Pesos da função proposta de Dafner et al.~\cite{dafner:00}}
+    \label{fig:context_weight}
+\end{figure}
 
 % Dessa maneira, a abordagem \textit{context-based} gera linearizações que tentam maximizar a coerência de dados próximos.
 % Contudo, é um método que não considera a coerência espacial em sua construção. A abordagem \textit{data-driven}, por sua vez,
 % atinge isso pela introdução de uma nova função de custo enquanto aproveita de todos os demais conceitos utilizados pelo
 % artigo original~\cite{dafner:00}.
 
-Dessa maneira, a abordagem \textit{context-based} gera linearizações que priorizam a coerência dos dados. 
-Contudo, este método não considera explicitamente a coerência espacial durante a construção da curva.
-A abordagem \textit{data-driven}, detalhada por Zhou et al.~\cite{zhou:20}, soluciona essa limitação
-introduzindo uma nova função de custo composta, preservando, no entanto, a estrutura fundamental
-de mapeamento dual e MST proposta no artigo original~\cite{dafner:00}.
+Embora a abordagem \textit{context-based} gere linearizações que priorizam a coerência dos dados,
+ela não considera explicitamente a coerência espacial. Isso pode ocasionar linearizações onde pixels
+vizinhos na imagem original fiquem distantes na sequência 1D, como visto no exemplo da Figura \ref{fig:spc_traversal}.
+A abordagem \textit{data-driven}, detalhada por Zhou et al.~\cite{zhou:20}, soluciona essa limitação introduzindo uma
+função de custo composta, preservando a estrutura fundamental de mapeamento dual e MST proposta no
+artigo original~\cite{dafner:00}.
 
-A abordagem \textit{data-driven}, conforme proposto em~\cite{zhou:20} utiliza a função de custo
-ponderada descrita na Equação \ref{eq:2}. Os componentes da equação são definidos como:
+
+A abordagem \textit{data-driven} utiliza a função de custo ponderada descrita na Equação \ref{eq:2}.
+Os componentes da equação são definidos como:
 
 % \begin{itemize}
 %   \item $N(C_i, C_j)$: a mesma função de custo de Dafner et al~\cite{dafner:00} destacada em \ref{eq:1};
@@ -286,7 +380,7 @@ ponderada descrita na Equação \ref{eq:2}. Os componentes da equação são def
     \item \textbf{$N(C_i, C_j)$:} Custo baseado na coerência dos dados, idêntico à função de Dafner et al.~\cite{dafner:00} (Equação \ref{eq:1});
     
     \item \textbf{$R_{\beta}(C_j)$:} Custo baseado na coerência espacial, definido pela distância euclidiana entre a célula $C_j$
-    e o seu centróide $S_{C_j}$, \textit{i.e}., $||C_j - S_{C_j}||$;
+    e o seu centróide $S_{C_j}$, \textit{i.e}., $\|C_j - S_{C_j}\|$;
     
     \item \textbf{$\alpha \in [0,1]$:} Fator de ponderação. Valores menores de $\alpha$ priorizam a similaridade dos dados,
     enquanto valores maiores priorizam a regularidade espacial do caminho;
@@ -301,27 +395,15 @@ ponderada descrita na Equação \ref{eq:2}. Os componentes da equação são def
 % alterados e configurados. A relação entre os fatores $N(C_i, C_j)$, $R_{\beta}(C_j)$ e $S_{C_j}$ pode
 % ser entendida na figura \ref{fig:data_driven_weight}.
 
-Na implementação desenvolvida neste trabalho, $\alpha$ e $\beta$ foram definidos 
-como hiperparâmetros configuráveis, permitindo o ajuste fino do comportamento da 
-curva e a análise do impacto que a variação desses parâmetros exerce sobre a 
-preenchimento resultante. A relação geométrica e estrutural entre os custos de dados 
-$N(C_{i}, C_{j})$ e espacial $R_{\beta}(C_{j})$ é ilustrada na Figura \ref{fig:data_driven_weight}.
-
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.35\textwidth]{images/weight_values_context_based.PNG}
-    \caption{Pesos da função proposta de Dafner et al.~\cite{dafner:00}}
-    \label{fig:context_weight}
-\end{figure}
-
-\begin{equation} \label{eq:1}
-    W{(C_{i},C_{j})} = |u| + |w| + |x| + |y| + |z| - |e| - |f|
-\end{equation}
-
 \begin{equation} \label{eq:2}
     W{(C_{i},C_{j})} = (1 - \alpha) N(C_i, C_j) + \alpha R_{\beta}(C_j)
 \end{equation}
+
+Neste trabalho, $\alpha$ e $\beta$ foram definidos 
+como hiperparâmetros configuráveis, permitindo o ajuste fino do comportamento da 
+curva de preenchimento de espaço e a análise do impacto que a variação desses parâmetros exerce sobre a 
+preenchimento resultante. A relação geométrica e estrutural entre os custos de dados 
+$N(C_{i}, C_{j})$ e espacial $R_{\beta}(C_{j})$ é ilustrada na Figura \ref{fig:data_driven_weight}.
 
 
 \begin{figure}[h]
@@ -414,11 +496,11 @@ Todos os parâmetros e seus significados são explicados a seguir:
 
 
 
-Neste trabalho, foram avaliadas duas métricas distintas para a função g: a \textit{L1-norm} e a \textit{L2-norm}.
+Neste trabalho, foram avaliadas duas métricas distintas para a função g: a Norma $L_1$ e a Norma $L_2$.
 Para ambas, são funções facilmente extensíveis para imagens com múltiplos canais.
 
-\subsubsection{\textit{L1-norm}}
-% Explicar a função g para L1-norm e tempo de complexidade
+\subsubsection{Norma $L_1$}
+% Explicar a função g para Norma $L_1$ e tempo de complexidade
 Nesta abordagem, a métrica local $g$ é a diferença absoluta, conforme a Equação \ref{eq:l1_cost}.
 Essa escolha mantém a consistência com a função de custo utilizada na construção da MST durante o algoritmo de Prim.
 Para imagens com múltiplos canais, a função é generalizada
@@ -437,8 +519,8 @@ Devido ao uso do módulo, a busca pela configuração ótima nesta estratégia o
 Visto que para cada possível deslocamento é necessário computar a diferença em todos os pixels e canais,
 a complexidade resultante é $O(C \cdot N^2)$, onde $C$ é o número de canais.
 
-\subsubsection{\textit{L2-norm}}
-% Explicar a função g para L2-norm e tempo de complexidade
+\subsubsection{Norma $L_2$}
+% Explicar a função g para Norma $L_2$ e tempo de complexidade
 Nesta abordagem, a métrica local $g$ é o quadrado da diferença, conforme a Equação \ref{eq:l2_cost}.
 Similarmente, essa função pode ser generalizada para imagens com múltiplos canais como apresentado na
 Equação \ref{eq:l2_cost_channels}.
@@ -474,12 +556,22 @@ final alcançada é $O(C \cdot N \log N)$, tal que $C$ é o número de canais.
 % -----------------------------------------------------------------------------------------------
 % -----------------------------------------------------------------------------------------------
 % -----------------------------------------------------------------------------------------------
+Para viabilizar a implementação e a análise experimental, desenvolveu-se uma arquitetura de software
+híbrida entre C++ e Python. A metodologia trata imagens estáticas no formato $H \times W$ (2D) ou $H \times W \times C$ (3D).
+Analogamente, dados espaço-temporais são processados como uma sequência de imagens estáticas do tipo $F \times H \times W$ ou $F \times H \times W \times C$,
+onde os parâmetros são definidos como:
 
-Visando alto desempenho computacional, o núcleo de processamento numérico foi implementado inteiramente em C++20.
+\begin{itemize}
+    \item $F$: quantidade de quadros;
+    \item $H$: altura da imagem (número de linhas);
+    \item $W$: largura da imagem (número de colunas);
+    \item $C$: número de canais de cor.
+\end{itemize}
+
+Visando alto desempenho computacional, o núcleo de processamento foi implementado inteiramente em C++20.
 Para garantir interoperabilidade e facilitar a análise exploratória, as funcionalidades foram expostas ao ambiente
-Python utilizando a biblioteca \texttt{Pybind11}, que atua como uma camada de integração leve.
-
-O ambiente de validação experimental foi construído sobre \textit{Jupyter Notebooks}, permitindo prototipagem
+Python utilizando a biblioteca \texttt{Pybind11}, que atua como uma camada de integração leve. O ambiente de
+validação experimental foi construído sobre \textit{Jupyter Notebooks}, permitindo prototipagem
 rápida e visualização imediata dos resultados. Essa estrutura permitiu avaliar como a variação dos hiperparâmetros
 impacta o tempo de execução, a correlação entre quadros e a qualidade visual das curvas geradas.
 
@@ -501,18 +593,64 @@ O código-fonte desenvolvido encontra-se disponível publicamente no repositóri
 Todos os testes foram realizados em um computador de uso pessoal, equipado com processador Intel Core
 i5-9300H 2.40 GHz, 16 GB de memória RAM e armazenamento em SSD Samsung 980 PRO. A implementação foi
 executada em um ambiente virtual (venv) operando dentro do Subsistema Windows para Linux (WSL2). 
-
 É importante ressaltar que o ambiente WSL2 dispunha de apenas 8 GB de memória RAM e os experimentos não
 fizeram uso de técnicas de paralelismo. Essa restrição assegura que as métricas de tempo coletadas reflitam
 estritamente a complexidade algorítmica.
 
 \subsection{Conjuntos de Dados}
 Para a validação experimental, foi selecionado um conjunto diversificado de dados, provenientes de três fontes distintas.
-Ressalta-se que, para garantir a consistência nos experimentos, todos os dados foram normalizados
+Ressalta-se que, para garantir a consistência nos experimentos, todos os valores foram normalizados
 para valores em ponto flutuante no intervalo $[0.0, 1.0]$.
 
+\subsubsection{Imagens de Teste}
+Para a validação da etapa de linearização, foram adotadas as figuras sintéticas propostas por
+Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}. Estes dados possuem dimensões $128 \times 128$ com
+valores em ponto flutuante. Neste trabalho, tais imagens foram utilizadas para testar como diferentes distribuições de dados
+influenciam o comportamento da curva e como a variação de hiperparâmetros afeta o padrão de preenchimento resultante.
+A Figura \ref{fig:koepp_images} ilustra esses padrões.
+
+
+\begin{figure}[ht]
+    \centering
+    \captionsetup[subfigure]{font=scriptsize, justification=centering}
+    
+    % --- Imagem 1 ---
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/koepp_normal.png}
+        % Dica: Se ainda quebrar feio, force a quebra manual com \\
+        \caption{Normal distribution} 
+    \end{subfigure}%
+    \hfill
+    % --- Imagem 2 ---
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/koepp_delta.png}
+        \caption{Delta sequence}
+    \end{subfigure}%
+    \hfill
+    % --- Imagem 3 ---
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/koepp_three.png}
+        \caption{Three features}
+    \end{subfigure}%
+    \hfill
+    % --- Imagem 4 ---
+    \begin{subfigure}[t]{0.24\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{images/koepp_skew.png}
+        \caption{Skew normal distribution}
+    \end{subfigure}
+    
+    \caption{Imagens de teste de Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}}
+    \label{fig:koepp_images}
+\end{figure}
+
+\FloatBarrier
 \subsubsection{Volumes do \textit{Open Scientific Visualization Datasets}}
-Para a validação experimental, foram utilizados diversos volumes de dados disponíveis na coleção
+Também para a validação da etapa de linearização, foram utilizados diversos
+volumes de dados disponíveis na coleção
 \textit{Open Scientific Visualization Datasets}~\cite{klacansky:osvd}, amplamente adotada na literatura,
 incluindo datasets usaods por Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM} e por Zhou et al.~\cite{zhou:20}
 em seus respectivos trabalhos.
@@ -521,7 +659,7 @@ Cortes transversais ao longo do eixo $z$ também são apresentados na Figura \re
 a diversidade dos dados.
 
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 \caption{Conjuntos de dados do \textit{Open SciVis}.}
 \label{tab:openscivis}
@@ -592,53 +730,8 @@ Nucleon          & $41  \times  41 \times  41$                & uint8       \\
     \label{fig:openscivis_slices}
 \end{figure}
 
-\subsubsection{Imagens de Teste}
-Para a validação do método em imagens estáticas, foram adotadas as figuras sintéticas propostas por
-Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}. Estes dados possuem dimensões $128 \times 128$ com
-valores em ponto flutuante. Neste trabalho, tais imagens foram utilizadas para testar como diferentes distribuições de dados
-influenciam o comportamento da curva e como a variação de hiperparâmetros afeta o padrão de preenchimento resultante.
-A Figura \ref{fig:koepp_images} ilustra esses padrões.
-
-
-\begin{figure}[ht]
-    \centering
-    \captionsetup[subfigure]{font=scriptsize, justification=centering}
-    
-    % --- Imagem 1 ---
-    \begin{subfigure}[t]{0.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/koepp_normal.png}
-        % Dica: Se ainda quebrar feio, force a quebra manual com \\
-        \caption{Normal distribution} 
-    \end{subfigure}%
-    \hfill
-    % --- Imagem 2 ---
-    \begin{subfigure}[t]{0.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/koepp_delta.png}
-        \caption{Delta sequence}
-    \end{subfigure}%
-    \hfill
-    % --- Imagem 3 ---
-    \begin{subfigure}[t]{0.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/koepp_three.png}
-        \caption{Three features}
-    \end{subfigure}%
-    \hfill
-    % --- Imagem 4 ---
-    \begin{subfigure}[t]{0.24\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{images/koepp_skew.png}
-        \caption{Skew normal distribution}
-    \end{subfigure}
-    
-    \caption{Imagens de teste de Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}}
-    \label{fig:koepp_images}
-\end{figure}
-
 \FloatBarrier
-\subsubsection{Animações Geradas}
+\subsubsection{Dados Sintéticos}
 % Para os experimentos espaço-temporais, foram gerados datasets sintéticos especificamente para
 % este trabalho. Esses dados são representam animações de objetos em diferentes cenários. Cada animação
 % é descrita a seguir:
@@ -709,18 +802,20 @@ quadros selecionados destas animações. Os cenários são descritos a seguir:
 % presente na Figura \ref{fig:openscivis_slices} (f), imagem usada na literatura para testes similares por tanto Zhou et al.
 %~\cite{zhou:20} quanto Köpp e Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 
-Inicialmente, avalia-se a abordagem proposta em comparação com curvas de preenchimento estabelecidas na
-literatura, especificamente \textit{Hilbert}, \textit{Scanline} e \textit{Context-based}. Para este comparativo, foi adotada a
+Inicialmente, analisa-se a sensibilidade da implementação \textit{data-driven} à variação de seus hiperparâmetros.
+Esse estudo é conduzido sobre os padrões sintéticos apresentados na Figura \ref{fig:koepp_images},
+o que permite a inspeção visual das alterações no padrão de preenchimento resultantes de diferentes configurações.
+
+Em seguida, compara-se a abordagem proposta com as curvas de Hilbert, \textit{scanline} e \textit{context-based}.
+As duas primeiras possuem geometria fixa: a de Hilbert baseia-se em recursão fractal, enquanto a \textit{scanline}
+segue uma varredura sequencial liha a linha. 
+Para este comparativo, foi adotada a
 imagem \textit{Nucleon} da Figura \ref{fig:openscivis_slices}(f), um dataset de referência frequentemente utilizado
-para validação de linearizações em trabalhos correlatos, como os de Zhou et al.~\cite{zhou:20} e Köpp e
+para validação de linearizações em trabalhos relacionados, como os de Zhou et al.~\cite{zhou:20} e Köpp e
 Weinkauf~\cite{KoeppWeinkauf2022_TMTM}.
 
 % Depois, é realizado a linearização das imagens presentes na Figura \ref{fig:koepp_images} e para ver visualmente quão
 % sensível é a implementação data-driven ao alterar seus hiperparâmetros.
-
-Em seguida, analisa-se a sensibilidade da implementação \textit{data-driven} à variação de seus hiperparâmetros.
-Esse estudo é conduzido sobre os padrões sintéticos apresentados na Figura \ref{fig:koepp_images},
-o que permite a inspeção visual das alterações no padrão de preenchimento resultantes de diferentes configurações.
 
 % Por fim, é replicado os testes criados por Zhou et al.~\cite{zhou:20} que calculam a média da autocorrelação de
 % duas métricas de forma a analizar seu desempenho. A média da autocorrelação definida em por Zhou et al. em seu artigo
@@ -728,111 +823,62 @@ o que permite a inspeção visual das alterações no padrão de preenchimento r
 % As duas métricas adotadas são:
 
 
-Por fim, replicam-se os testes estabelecidos por Zhou et al.~\cite{zhou:20}, calculando-se a média da
-autocorrelação normalizada de duas métricas para analisar o desempenho das curvas. A normalização dos
-dados assegura que a correlação varie no intervalo $[-1, +1]$, o que possibilita a comparação justa entre diferentes datasets.
+% Por fim, replicam-se os testes estabelecidos por Zhou et al.~\cite{zhou:20}, calculando-se a média da
+% autocorrelação normalizada de duas métricas para analisar o desempenho das CPE. A normalização dos
+% dados assegura que a correlação varie no intervalo $[-1, +1]$, o que possibilita a comparação justa entre diferentes datasets.
 
-A métrica de média definida pelos autores consiste em um gráfico onde o eixo $x$ representa o \textit{lag} e
-o eixo $y$ exibe a média dos valores de correlação computados na janela de $-lag$ a $+lag$. As métricas adotadas são:
+% A métrica de média definida pelos autores consiste em um gráfico onde o eixo $x$ representa o \textit{lag} e
+% o eixo $y$ exibe a média dos valores de correlação computados na janela de $-lag$ a $+lag$. As métricas adotadas são:
 
-\begin{itemize}
- \item \textbf{Média Autocorrelação de Dados:} Considera a sequência das intensidades da linearização, \textit{i.e}, $s(i) = image(P(i).x, P(i).y)$; 
- \item \textbf{Média Autocorrelação Radial:} Considera a norma da posição espacial na linearização, \textit{i.e}, $s(i) = ||(P(i).x, P(i).y)||$
-\end{itemize}
+% \begin{itemize}
+%  \item \textbf{Média Autocorrelação de Dados:} Considera a sequência das intensidades da linearização, \textit{i.e}, $s(i) = image(P(i).x, P(i).y)$; 
+%  \item \textbf{Média Autocorrelação Radial:} Considera a norma da posição espacial na linearização, \textit{i.e}, $s(i) = ||(P(i).x, P(i).y)||$
+% \end{itemize}
 
-\subsubsection{Comparativo Visual no Dataset Nucleon}
 
-\begin{figure}[htbp]
-    \centering
-    % --- COLUNA DA ESQUERDA: INPUT ---
-    \begin{minipage}[c]{0.13\textwidth}
-        \centering
-        \includegraphics[width=0.98\linewidth]{images/nucleon_comparison/nucleon_center_slice.png}
-        \par\vspace{5pt} 
-        \small{(a)}
-    \end{minipage}%
-    \hfill
-    % --- COLUNA DA DIREITA: OUTPUT MATRIZ ---
-    \begin{minipage}[c]{0.85\textwidth}
-        \centering
-        \setlength{\tabcolsep}{1pt} 
-        \renewcommand{\arraystretch}{0.5}
-        
-        \begin{tabular}{c c c c c}
-             % CABEÇALHO: Nomes completos e Data-Driven primeiro
-             & \tiny{\textbf{Data-Driven}} & \tiny{\textbf{Context-Base}} & \tiny{\textbf{Hilbert}} & \tiny{\textbf{Scanline}} \\
-            
-            % LINHA 1: Linearization (Trocando coluna 1 e 2)
-            \rotatebox{90}{\tiny{\textbf{(b) Linearização}}} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_linearization.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_linearization.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_linearization.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_linearization.png} \\
-            
-            % LINHA 2: Colormap (Trocando coluna 1 e 2)
-            \rotatebox{90}{\tiny{\textbf{(c) Colormap}}} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_colormap.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_colormap.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_colormap.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_colormap.png} \\
-            
-            % LINHA 3: Traversal (Trocando coluna 1 e 2)
-            \rotatebox{90}{\tiny{\textbf{(d) Caminho}}} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_traversal.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_traversal.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_traversal.png} &
-            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_traversal.png} \\
-        \end{tabular}
-    \end{minipage}
-    
-    \caption{Comparação visual do método de linearização \textit{data-driven} com
-    demais métodos sobre o corte transversal do dataset Nucleon (a) inspirado por
-    comparação similar em Zhou et al~\cite{zhou:20}.
-    }
-    \label{fig:matrix_comparison_side}
-\end{figure}
+% Para quantificar a qualidade das curvas de preenchimento de espaço, replicam-se os critérios estabelecidos por
+% Zhou et al.~\cite{zhou:20}, que avaliam a capacidade da curva em preservar a localidade dos dados e espacial após
+% a linearização. A principal ferramenta adotada para isso é a autocorrelação, uma medida que indica o grau de
+% dependência linear entre uma sequência de dados e uma versão deslocada de si mesma. Dada uma sequência
+% unidimensional $x[n]$ de comprimento $N$, a autocorrelação $R_{xx}[k]$ para um deslocamento $k$ é definida
+% matematicamente pela correlação cruzada na Equação \ref{eq:autocorr}. Esta sequência está definida para
+% $k \in [-(N-1), +(N-1)]$. Para normalizar os valores resultantes da
+% autocorrelação no intervalo $[-1, +1]$ se faz $x \leftarrow \frac{x}{\|x\|}$ anteriormente, tal que quanto maior os valores, mais
+% semelhantes são os dados para um deslocamento $k$. Dessa forma permitindo a
+% comparação justa entre diferentes conjuntos de dados. O objetivo final é criar plots de figuras onde o eixo x está o
+% deslocamento $k$, e o eixo y representa a média dos valores encontrados no intervalo $[-k, +k]$ em $R_{xx}$.
 
-% A Figura \ref{fig:matrix_comparison_side} mostra diferentes comparações entre métodos de curvas de preenchimento,
-% são eles Data-Driven, Context-base, Hilbert e Scanline. Todos os métodos foram aplicados sobre o dataset presente na
-% Figura \ref{fig:matrix_comparison_side} (a). Esse dataset consiste de uma única feature com dois máximos próximos um
-% do outro. A linearização do caminho \ref{fig:matrix_comparison_side} (b) tanto no caso Data-Driven quanto no Context-base
-% mostram claramente dois máximos próximos um do outro, o que não acontece para as curvas de preenchimento Hilbert e Scanline,
-% pois são algoritmos que não são data-aware. A principal diferença entre Data-driven e Context-base pode ser observado
-% na Figura \ref{fig:matrix_comparison_side} (c), que mostra as curvas de preenchimento propriamente. Nota-se que para a
-% implementação data-driven, as curvas tendem a ser muito mais sinuosas devido a escolha de seus hiperparâmetros, enquanto
-% a implementação context-base costuma a ter caminhos muito em linha reta. Esse resultado pode ser visto também na implementação
-% de Zhou et al~\cite{zhou:20}. Isso acontece, pois na implementação do autor e na minha, em caso de empates na formula
-% de distância presente na Equação \ref{eq:2} durante o algoritmo de Prim, direções tem precedencia entre si. Embora, as
-% implementações difiram nessas precedencias, resultados semelhantes são encontrados.
+Para quantificar a qualidade das curvas de preenchimento de espaço, replicam-se os critérios estabelecidos por
+Zhou et al.~\cite{zhou:20}, os quais avaliam a capacidade da curva em preservar tanto a localidade dos dados
+quanto a localidade espacial após a linearização. A principal ferramenta adotada para isso é a
+autocorrelação, uma medida que indica o grau de similaridade entre uma sequência de dados
+e uma versão deslocada de si mesma.
 
-A Figura \ref{fig:matrix_comparison_side} apresenta a análise comparativa entre o método \textit{data-driven} e as
-abordagens \textit{context-based}, \textit{hilbert} e \textit{scanline} implementados neste trabalho. A avaliação
-foi conduzida sobre um corte transversal do volume \textit{Nucleon} destacado na Figura \ref{fig:matrix_comparison_side}a,
-que consiste de uma única feature com dois máximos locais próximos.
+Dada uma sequência unidimensional discreta $x[n]$ de comprimento $N$, a autocorrelação $R_{xx}[k]$ para um
+deslocamento $k$, definido no intervalo de $k$ entre $-(N-1)$ e $+(N-1)$, é calculada conforme a Equação \ref{eq:autocorr}.
+Para assegurar a invariância de escala e permitir uma comparação justa entre diferentes conjuntos de dados, a
+sequência $x$ é previamente normalizada pela sua norma euclidiana $L_2$. Com essa normalização, os valores
+resultantes de $R_{xx}$ restringem-se ao intervalo $[-1, +1]$, onde valores próximos de $+1$ indicam alta similaridade
+para o deslocamento $k$. A métrica final é visualizada graficamente, onde o eixo horizontal representa o deslocamento
+$k$ e o eixo das vertical exibe a média dos valores de autocorrelação computados na janela $[-k, +k]$.
 
-Uma representação da linearização resultante é exibida na linha \textbf{(b)}. Observa-se que tanto a abordagem
-\textit{data-driven} quanto a \textit{context-based} conseguem capturar a semântica dos dados, traduzindo os
-dois picos originais em elevações contínuas e distintas no gráfico. Em contrapartida, as curvas \textit{hilbert}
-e \textit{scanline}, por serem agnósticas aos dados, fragmentam essas estruturas, gerando um sinal oscilatório que
-não reflete diretamente a estrutura do dataset.
+\begin{equation} \label{eq:autocorr}
+    \begin{split}
+        x & \leftarrow \frac{x}{\|x\|} \\
+        R_{xx}[k] & = \sum_{i=0}^{N-1} x[i] \cdot x[i+k]
+    \end{split}
+\end{equation} 
 
-A distinção estrutural entre as abordagens guiadas por dados torna-se evidente na visualização do caminho
-percorrido, apresentada na linha \textbf{(d)}:
+
+Duas sequências são construídas a partir da linearização $P$, onde $P_i$ representa a i-ésima coordenada visitada
+na curva de preenchimento de espaço. A partir delas, são construídas as métricas de autocorrelação utilizadas. São elas:
 
 \begin{itemize}
-    \item Na abordagem \textbf{\textit{context-based}}, o algoritmo minimiza estritamente a
-    diferença de valores destacados na Equação \ref{eq:1}, o que frequentemente resulta em arestas
-    longas e retilíneas que conectam pixels de intensidade similar.
-    \item Na implementação \textbf{\textit{data-driven}}, a introdução do custo de coerência espacial
-    presente na Equação \ref{eq:2} força a curva a ser mais compacta e sinuosa, preenchendo localmente uma região
-    antes de transitar para a próxima.
+ \item \textbf{Autocorrelação Média de Dados:} Avalia se pixels com intensidades semelhantes na imagem permanecem próximos na sequência linearizada.
+ Seja $I(p)$ a intensidade do pixel na posição $p$, a sequência é definida como $s[i] = I(P_i)$.
+ \item \textbf{Autocorrelação Média Radial:} Avalia se coordenadas próximas permanecem próximas na sequência linearizada.
+ A sequência é definida como $s[i] = \|P_i\|$, medindo a distância da coordenada $P_i$ à origem.
 \end{itemize}
-
-Este comportamento sinuoso da abordagem \textit{data-driven} e as linhas retilíneas da abordagem \textit{context-based} corroboram
-os resultados apresentados originalmente por Zhou et al.~\cite{zhou:20}.
-Vale ressaltar que a formação desses padrões geométricos repetitivos decorre da natureza determinística do
-algoritmo de Prim. Em situações em que múltiplos vizinhos apresentam custo idêntico na Equação \ref{eq:2}, a ordem de
-precedência das direções (norte, sul, leste, oeste) atua como critério de desempate, induzindo a curva em direções preferenciais.
 
 \subsubsection{Análise de Sensibilidade a Hiperparâmetros}
 
@@ -903,6 +949,105 @@ imagem em blocos. Em especial, nota-se que a capacidade de distinguir o número 
 visto que a combinação de $\alpha$ e $\beta$ pode fragmentar uma mesma estrutura em múltiplos segmentos do caminho.
 
 \FloatBarrier
+\subsubsection{Comparativo Visual no Dataset Nucleon}
+
+\begin{figure}[htbp]
+    \centering
+    % --- COLUNA DA ESQUERDA: INPUT ---
+    \begin{minipage}[c]{0.13\textwidth}
+        \centering
+        \includegraphics[width=0.98\linewidth]{images/nucleon_comparison/nucleon_center_slice.png}
+        \par\vspace{5pt} 
+        \small{(a)}
+    \end{minipage}%
+    \hfill
+    % --- COLUNA DA DIREITA: OUTPUT MATRIZ ---
+    \begin{minipage}[c]{0.85\textwidth}
+        \centering
+        \setlength{\tabcolsep}{1pt} 
+        \renewcommand{\arraystretch}{0.5}
+        
+        \begin{tabular}{c c c c c}
+             % CABEÇALHO: Nomes completos e Data-Driven primeiro
+             & \tiny{\textbf{Data-Driven}} & \tiny{\textbf{Context-Base}} & \tiny{\textbf{Hilbert}} & \tiny{\textbf{Scanline}} \\
+            
+            % LINHA 1: Linearization (Trocando coluna 1 e 2)
+            \rotatebox{90}{\tiny{\textbf{(b) Linearização}}} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_linearization.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_linearization.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_linearization.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_linearization.png} \\
+            
+            % LINHA 2: Colormap (Trocando coluna 1 e 2)
+            \rotatebox{90}{\tiny{\textbf{(c) Colormap}}} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_colormap.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_colormap.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_colormap.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_colormap.png} \\
+            
+            % LINHA 3: Traversal (Trocando coluna 1 e 2)
+            \rotatebox{90}{\tiny{\textbf{(d) Caminho}}} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/data_driven_traversal.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/context_base_traversal.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/hilbert_traversal.png} &
+            \includegraphics[width=0.22\linewidth]{images/nucleon_comparison/scanline_traversal.png} \\
+        \end{tabular}
+    \end{minipage}
+    
+    \caption{Comparação visual do método de linearização \textit{data-driven} com
+    demais métodos sobre o corte transversal do dataset Nucleon (a) inspirado por
+    comparação similar em Zhou et al~\cite{zhou:20}.
+    }
+    \label{fig:matrix_comparison_side}
+\end{figure}
+
+% A Figura \ref{fig:matrix_comparison_side} mostra diferentes comparações entre métodos de curvas de preenchimento,
+% são eles Data-Driven, Context-base, Hilbert e Scanline. Todos os métodos foram aplicados sobre o dataset presente na
+% Figura \ref{fig:matrix_comparison_side} (a). Esse dataset consiste de uma única feature com dois máximos próximos um
+% do outro. A linearização do caminho \ref{fig:matrix_comparison_side} (b) tanto no caso Data-Driven quanto no Context-base
+% mostram claramente dois máximos próximos um do outro, o que não acontece para as curvas de preenchimento Hilbert e Scanline,
+% pois são algoritmos que não são data-aware. A principal diferença entre Data-driven e Context-base pode ser observado
+% na Figura \ref{fig:matrix_comparison_side} (c), que mostra as curvas de preenchimento propriamente. Nota-se que para a
+% implementação data-driven, as curvas tendem a ser muito mais sinuosas devido a escolha de seus hiperparâmetros, enquanto
+% a implementação context-base costuma a ter caminhos muito em linha reta. Esse resultado pode ser visto também na implementação
+% de Zhou et al~\cite{zhou:20}. Isso acontece, pois na implementação do autor e na minha, em caso de empates na formula
+% de distância presente na Equação \ref{eq:2} durante o algoritmo de Prim, direções tem precedencia entre si. Embora, as
+% implementações difiram nessas precedencias, resultados semelhantes são encontrados.
+
+A Figura \ref{fig:matrix_comparison_side} apresenta a análise comparativa entre o método \textit{data-driven} e as
+abordagens \textit{context-based}, Hilbert e \textit{scanline} implementados neste trabalho. A avaliação
+foi conduzida sobre um corte transversal do volume \textit{Nucleon} destacado na Figura \ref{fig:matrix_comparison_side}a,
+que consiste de uma única feature com dois máximos locais próximos.
+
+Representações da linearização resultante são exibidas nas linhas \textbf{(b)}, \textbf{(c)} e \textbf{(d)}.
+A linha \textbf{(b)} exibe o sinal unidimensional gerado, onde o eixo vertical corresponde ao valor do pixel e
+o eixo horizontal ao índice da sequência linearizada.
+Complementarmente, as linhas \textbf{(c)} e \textbf{(d)} ilustram
+o trajeto da curva de preenchimento de espaço sobre a imagem através de um gradiente visual, onde tons
+escuros indicam o início e tons claros, o fim do percurso.
+Observa-se em \textbf{(b)} que tanto a abordagem
+\textit{data-driven} quanto a \textit{context-based} conseguem capturar a semântica dos dados, traduzindo os
+dois picos originais em elevações contínuas e distintas no gráfico. Em contrapartida, as curvas Hilbert
+e \textit{scanline}, por serem agnósticas aos dados, fragmentam essas estruturas, gerando um sinal oscilatório que
+não reflete diretamente a estrutura do dataset. Essa distinção comportamental é corroborada pelavisualização do caminho
+percorrido, apresentada na linha \textbf{(d)}:
+
+\begin{itemize}
+    \item Na abordagem \textbf{\textit{context-based}}, o algoritmo minimiza estritamente a
+    diferença de valores destacados na Equação \ref{eq:1}, o que frequentemente resulta em arestas
+    longas e retilíneas que conectam pixels de intensidade similar.
+    \item Na abordagem \textbf{\textit{data-driven}}, a introdução do custo de coerência espacial
+    presente na Equação \ref{eq:2} força a curva a ser mais compacta e sinuosa, preenchendo localmente uma região
+    antes de transitar para a próxima.
+\end{itemize}
+
+Este comportamento sinuoso da abordagem \textit{data-driven} e as linhas retilíneas da abordagem \textit{context-based} corroboram
+os resultados apresentados originalmente por Zhou et al.~\cite{zhou:20}.
+Vale ressaltar que a formação desses padrões geométricos repetitivos decorre da natureza determinística do
+algoritmo de Prim. Em situações em que múltiplos vizinhos apresentam custo idêntico na Equação \ref{eq:2}, a ordem de
+precedência das direções (norte, sul, leste, oeste) atua como critério de desempate, induzindo a CPE em direções preferenciais.
+
+\FloatBarrier
 \subsubsection{Avaliação Quantitativa via Autocorrelação}
 % Para mensurar a autocorrelação foi tomado como conjunto de dados 10 cortes transversais de cada dataset do
 % \textit{Open SciVis} presentes na Tabela \ref{tab:openscivis} bem como 10 cortes transversais das animações
@@ -912,11 +1057,12 @@ visto que a combinação de $\alpha$ e $\beta$ pode fragmentar uma mesma estrutu
 % para diferentes configurações e calculado a média.
 
 Para a avaliação quantitativa da autocorrelação, estabeleceu-se um conjunto de dados composto por 10 cortes
-transversais de cada volume do \textit{Open SciVis} presentes na Tabela \ref{tab:openscivis}, somados a 10 quadros das animações
+transversais de cada volume do \textit{Open SciVis} presentes na Tabela \ref{tab:openscivis}, juntos a 10 quadros das animações
 sintéticas apresentadas na Figura \ref{fig:moving_frames}. Nos experimentos subsequentes, manteve-se o valor de
 $\beta$ fixo, variando-se exclusivamente o hiperparâmetro $\alpha$. Para cada imagem selecionada, foram computadas
 as métricas de autocorrelação de dados e radial, obtendo-se a média global dos resultados para as diferentes
-configurações avaliadas.
+configurações avaliadas. Os resultados comparativos dessa avaliação são detalhados nas
+Figuras \ref{fig:autocorrelation_alpha_results} e \ref{fig:autocorrelation_algorithms_results}. 
 
 \begin{figure}[htbp]
     \centering
@@ -964,7 +1110,7 @@ configurações avaliadas.
     \end{subfigure}
     
     \caption{Comparação da autocorrelação média normalizada entre as abordagens \textit{data-driven},
-    \textit{hilbert} e \textit{scanline}. (a) A métrica de dados avalia a
+    Hilbert e \textit{scanline}. (a) A métrica de dados avalia a
     continuidade das intensidades. (b) A métrica radial avalia a preservação da vizinhança espacial.}
     \label{fig:autocorrelation_algorithms_results}
 \end{figure}
@@ -981,15 +1127,11 @@ configurações avaliadas.
 % o mesmo padrão em blocos.
 
 % Por sua vez, a Figura \ref{fig:autocorrelation_algorithms_results} compara como a abordagem \textit{data-driven}
-% se compara contra as abordagens \textit{hilbert} e \textit{scanline} para o valor fixo de $\alpha = 0.1$ nas métricas
+% se compara contra as abordagens Hilbert e \textit{scanline} para o valor fixo de $\alpha = 0.1$ nas métricas
 % de coerência dos dados (a) e a de coerência espacial geométrica (b). Os resultados obtidos são semelhantes aos descritos
 % por Zhout et al.~\cite{zhou:20}, que mostra o \textit{trade-off} de aumentar a autocorrelação radial causa a abordagem
 % \textit{data-driven} ter resultados semelhantes na autocorrelação radial, mesmo havendo uma leve perda da autocorrelação
 % dos dados.
-
-
-Os resultados comparativos dessa avaliação são detalhados nas Figuras \ref{fig:autocorrelation_alpha_results} e
-\ref{fig:autocorrelation_algorithms_results}. 
 
 A Figura \ref{fig:autocorrelation_alpha_results} ilustra o comportamento médio das curvas em relação ao
 deslocamento (\textit{lag}), evidenciando o \textit{trade-off} imposto pelo hiperparâmetro $\alpha$, cujo
@@ -997,7 +1139,6 @@ incremento reduz a autocorrelação de dados ao passo que amplia a autocorrelaç
 uma degradação acentuada nas métricas para o caso limite de $\alpha = 1$. Isso ocorre pois, neste extremo, o
 método negligencia o termo dos dados em favor do termo puramente espacial da Equação \ref{eq:2}, o que
 aproxima o comportamento da curva ao do algoritmo \textit{scanline} ao percorrer a imagem em blocos rígidos.
-
 Por sua vez, a Figura \ref{fig:autocorrelation_algorithms_results} confronta a abordagem \textit{data-driven}
 para o valor fixo $\alpha = 0.1$ com as curvas de hilbert e \textit{scanline}. Os resultados
 corroboram as observações de Zhou et al.~\cite{zhou:20}, pois nota-se que o ganho na coerência espacial
@@ -1029,8 +1170,8 @@ de alinhamento (Sem alinhamento, Normas L1 e L2), mantendo-se fixo o hiperparâm
     % --- CABEÇALHO DAS COLUNAS ---
     \footnotesize
     \makebox[0.32\linewidth]{\textbf{Sem Alinhamento}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L1-norm}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L2-norm}}
+    \makebox[0.32\linewidth]{\textbf{Norma $L_1$}} \hfill
+    \makebox[0.32\linewidth]{\textbf{Norma $L_2$}}
     \par\smallskip
 
     % --- (a) ALPHA = 0.0 ---
@@ -1063,8 +1204,8 @@ de alinhamento (Sem alinhamento, Normas L1 e L2), mantendo-se fixo o hiperparâm
     % --- CABEÇALHO DAS COLUNAS ---
     \footnotesize
     \makebox[0.32\linewidth]{\textbf{Sem Alinhamento}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L1-norm}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L2-norm}}
+    \makebox[0.32\linewidth]{\textbf{Norma $L_1$}} \hfill
+    \makebox[0.32\linewidth]{\textbf{Norma $L_2$}}
     \par\smallskip
 
     % --- (a) ALPHA = 0.0 ---
@@ -1097,8 +1238,8 @@ de alinhamento (Sem alinhamento, Normas L1 e L2), mantendo-se fixo o hiperparâm
     % --- CABEÇALHO DAS COLUNAS ---
     \footnotesize
     \makebox[0.32\linewidth]{\textbf{Sem Alinhamento}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L1-norm}} \hfill
-    \makebox[0.32\linewidth]{\textbf{L2-norm}}
+    \makebox[0.32\linewidth]{\textbf{Norma $L_1$}} \hfill
+    \makebox[0.32\linewidth]{\textbf{Norma $L_2$}}
     \par\smallskip
 
     % --- (a) ALPHA = 0.0 ---
@@ -1169,7 +1310,7 @@ obtido é comparada diretamente com o padrão da literatura reportado por Köpp 
         % Se quiser forçar que tenham a mesma altura visual, use height=5cm (exemplo)
         % mas keepaspectratio garante que não distorça.
         \includegraphics[width=\linewidth]{images/animations/rotated_expanding_ring_00_l2_norm.png}
-        \caption{Rotação do resultado L2-norm da Figura \ref{fig:anim_expanding_ring}}
+        \caption{Rotação do resultado da Norma $L_2$ da Figura \ref{fig:anim_expanding_ring}}
         \label{subfig:my_rotated_ring}
     \end{subfigure}
     \hfill % Espaço elástico no meio
@@ -1238,14 +1379,14 @@ para expor a implementação de C++ para Python.
 % As Figuras \ref{fig:execution_time_align} e \ref{fig:execution_time_align_frame} medem o tempo de execução total causados pela
 % estratégia de alinhamento sobre diferentes abordagens. Na Figura \ref{fig:execution_time_align} tem-se um volume de dados
 % com apenas dois quadros, enquanto varia-se na horizontal o número de pixels em cada um desses quadros. Observa-se nessa imagem
-% a complexidade da estratégia de alinhamento \textit{L1-norm}, que possui complexidade quadrática no número de pixels, enquanto
-% a estratégia \textit{L2-norm} introduz pouco custo adicional, pois tem a mesma complexidade de execução do algoritmo de Prim.
+% a complexidade da estratégia de alinhamento Norma $L_1$, que possui complexidade quadrática no número de pixels, enquanto
+% a estratégia Norma $L_2$ introduz pouco custo adicional, pois tem a mesma complexidade de execução do algoritmo de Prim.
 
 As Figuras \ref{fig:execution_time_align} e \ref{fig:execution_time_align_frame} avaliam o tempo de execução total
 decorrente da estratégia de alinhamento escolhida. Na Figura \ref{fig:execution_time_align},
 considera-se um volume de dados com apenas dois quadros, variando-se o número de pixels em cada um deles.
-Observa-se o elevado custo da estratégia \textit{L1-norm}, que exibe complexidade quadrática em relação ao
-número de pixels, enquanto a estratégia \textit{L2-norm} introduz pouco custo adicional, pois possui a mesma
+Observa-se o elevado custo da estratégia Norma $L_1$, que exibe complexidade quadrática em relação ao
+número de pixels, enquanto a estratégia Norma $L_2$ introduz pouco custo adicional, pois possui a mesma
 ordem de complexidade do algoritmo de Prim.
 
 % Por sua vez, na Figura \ref{fig:execution_time_align_frame} se mantem fixo o número de pixels em cada quadro em $32 \times 32$,
@@ -1274,7 +1415,7 @@ $\alpha$, onde valores maiores promovem curvas de preenchimento de espaço em bl
 coerência dos dados.
 
 No contexto das animações, foram introduzidas duas estratégias de alinhamento espaço-temporal entre quadros:
-\textit{L1-norm} e \textit{L2-norm}. Os resultados indicam a necessidade dessas técnicas, uma vez que sua
+Norma $L_1$ e Norma $L_2$. Os resultados indicam a necessidade dessas técnicas, uma vez que sua
 ausência gera figuras desconexas. A adoção dessas estratégias mostrou-se efetiva em cenários simples, onde
 há apenas uma \textit{feature} de interesse ao longo da animação. Contudo, observou-se uma limitação
 em cenários contendo múltiplos objetos simultâneos. Mesmo que o método \textit{data-driven} seja capaz de
